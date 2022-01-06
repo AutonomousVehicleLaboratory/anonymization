@@ -1,6 +1,11 @@
 ## Structure
-yolov5-face - tracker - sort.py
-            - detect_face.py
+```
+yolov5-face
+│   detect_face.py 
+│
+└───tracker
+│   │   sort.py   
+```
 ## Guide
 - Install requirements
 ``pip install -r AVL.env.txt``
