@@ -1,0 +1,13 @@
+WEIGHTS: './weights/face.pt'
+IMAGE: '/home/jliao/rosbags/2021-10-26-17-08-32/avt_cameras_camera6_image_color_compressed/'
+SAVE_DIR: '/home/jliao/yolov5-face/output_dir/avt_cameras_camera6/'
+TRACK_ONLY: True
+WRITE_VIDEO: False
+DISPLAY_RESULTS: False
+IMAGE_SIZE: 800
+CONF_THRES: 0.3
+IOU_THRES: 0.5
+TRACKER:
+  MAX_AGE: 5
+  MIN_HITS: 3
+  IOU_THRES: 0.3
