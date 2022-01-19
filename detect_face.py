@@ -23,6 +23,7 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 from tracker.sort import Sort
 from config.base_config_detect_face import get_cfg_defaults
 
+
 def load_model(weights, device):
     model = attempt_load(weights, map_location=device)  # load FP32 model
     return model
@@ -52,11 +53,20 @@ def scale_coords_landmarks(img1_shape, coords, img0_shape, ratio_pad=None):
     coords[:, 8].clamp_(0, img0_shape[1])  # x5
     coords[:, 9].clamp_(0, img0_shape[0])  # y5
     return coords
+
+
 def show_tracking(img, xyxyconfs, colors):
+    h,w,c = img.shape
+    tl = 1 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
     for xyxyconf in xyxyconfs:
-        x1, y1, x2, y2, conf = int(xyxyconf[0]), int(xyxyconf[1]), int(xyxyconf[2]), int(xyxyconf[3]), int(xyxyconf[4])
-        cv2.rectangle(img, (x1,y1), (x2, y2), colors[conf%32], thickness=3, lineType=cv2.LINE_AA)
+        x1, y1, x2, y2 = int(xyxyconf[0]), int(xyxyconf[1]), int(xyxyconf[2]), int(xyxyconf[3])
+        trk_id, hit_streak, hits = int(xyxyconf[4]), int(xyxyconf[6]), int(xyxyconf[7])
+        
+        cv2.rectangle(img, (x1,y1), (x2, y2), colors[trk_id%32], thickness=3, lineType=cv2.LINE_AA)
+        track_str = "ID" + str(trk_id) + " HS" + str(hit_streak) + " H" + str(hits)
+        cv2.putText(img, track_str, (x1, y2 + int(tl) + 12), 0, tl/2, [225, 255, 255], thickness=2, lineType=cv2.LINE_AA)
     return img
+
 
 def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
     h,w,c = img.shape
@@ -77,8 +87,31 @@ def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
 
     tf = max(tl - 1, 1)  # font thickness
     label = str(conf)[:5]
-    cv2.putText(img, label, (x1, y1 - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+    cv2.putText(img, label, (x1, y1 - 2), 0, tl / 2, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
     return img
+
+
+def view_tracking_with_history(img_list, display_crop = False):
+    img_id = len(img_list) -1
+    while img_id >= 0 and img_id < len(img_list):
+        img = img_list[img_id]
+        if display_crop:
+            img_cropped = img[int(img.shape[0]*2/5)::]
+        else:
+            img_cropped = img
+        command_text = "q:Quit, p:Previous, n:Next, others:continue tracking"
+        cv2.putText(img_cropped, command_text, (30,30), 0, 0.9, [0,255,255], 2, cv2.LINE_AA)
+        cv2.imshow("Tracking", img_cropped)
+        if (cv2.waitKey(0) == ord('q')):
+            exit(0)
+        elif (cv2.waitKey(0) == ord('p')):
+            if img_id > 0:
+                img_id = img_id - 1
+        elif (cv2.waitKey(0) == ord('n')):
+            if img_id + 1 < len(img_list):
+                img_id = img_id + 1
+        else:
+            break
 
 def detect_output(model, image_path, device):
     # Load model
@@ -140,6 +173,7 @@ def detect_output(model, image_path, device):
                 landmarks = (det[j, 5:15].view(1, 10) / gn_lks).view(-1).tolist()
                 class_num = det[j, 15].cpu().numpy()
                 orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
+
 
 def detect_one(model, image_path, device):
     # Load model
@@ -204,6 +238,7 @@ def detect_one(model, image_path, device):
     if not os.path.isdir( 'output_dir' ) :
         os.mkdir( 'output_dir' )  # make sure the directory exists
     print(cv2.imwrite("./output_dir/result2.jpg", orgimg))
+
 
 def detection_test(model, image_dir, device, save_dir):
     # Load model
@@ -280,6 +315,7 @@ def detection_test(model, image_dir, device, save_dir):
     out.release()
     T_1 = time_synchronized()
     print("Total inference time: ", T_1 - T_0)
+
 
 def detect_and_track(cfg, model, image_dir, device, save_dir, show_landmark = False, detection_path = None):
     write_video = cfg.WRITE_VIDEO
@@ -588,10 +624,10 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
         cv2.namedWindow("Tracking", cv2.WND_PROP_FULLSCREEN)
 
     # Load Tracker
-    MAX_AGE = cfg.TRACKER.MAX_AGE
-    MIN_HITS = cfg.TRACKER.MIN_HITS
-    IOU_THRES = cfg.TRACKER.IOU_THRES
-    tracker = Sort(max_age = MAX_AGE, min_hits = MIN_HITS, iou_threshold = IOU_THRES)
+    tracker = Sort(max_age = cfg.TRACKER.MAX_AGE, 
+                   min_hits = cfg.TRACKER.MIN_HITS, 
+                   iou_threshold = cfg.TRACKER.IOU_THRES,
+                   distance_threshold = cfg.TRACKER.DISTANCE_THRESHOLD)
     # colors = [(0,0,255)]
     colors = []
     
@@ -599,6 +635,7 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
         colors.append((0,0,255))
         # colors.append((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
     
+    img_list = []
     for image_path in image_paths:
         orgimg = cv2.imread(image_dir+image_path)  # BGR
         img0 = copy.deepcopy(orgimg)
@@ -624,15 +661,13 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
         tracking_res = tracker.update(dets)
         orgimg = show_tracking(orgimg, tracking_res, colors)
         print(image_path+" done")
+        img_list.append(orgimg)
 
         # cv2.imwrite(save_dir + image_path, orgimg)
         if write_video:
             out.write(orgimg)
         if display_results:
-            cv2.imshow("Tracking", orgimg)
-            if (cv2.waitKey(0) == ord('q')):
-                break
-        
+            view_tracking_with_history(img_list, display_crop=cfg.DISPLAY_CROP)
 
         # t1 = time_synchronized()
         # print("Time: ", t1-t0)

@@ -35,6 +35,9 @@ _C.WRITE_VIDEO = False
 
 _C.DISPLAY_RESULTS = False
 
+# Crop the upper part of the displayed image for better visualization
+_C.DISPLAY_CROP = False
+
 # YOLOv5Face parameters
 
 _C.WEIGHTS = './weights/face.pt'
@@ -54,3 +57,5 @@ _C.TRACKER.MAX_AGE = 5
 _C.TRACKER.MIN_HITS = 3
 
 _C.TRACKER.IOU_THRES = 0.3
+
+_C.TRACKER.DISTANCE_THRESHOLD = 100
