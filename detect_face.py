@@ -619,7 +619,7 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
         detection_dict = {}    
     
     if write_video:
-        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_both.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
+        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_giou.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
     if display_results:
         cv2.namedWindow("Tracking", cv2.WND_PROP_FULLSCREEN)
 
@@ -627,7 +627,8 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
     tracker = Sort(max_age = cfg.TRACKER.MAX_AGE, 
                    min_hits = cfg.TRACKER.MIN_HITS, 
                    iou_threshold = cfg.TRACKER.IOU_THRES,
-                   distance_threshold = cfg.TRACKER.DISTANCE_THRESHOLD)
+                   distance_threshold = cfg.TRACKER.DISTANCE_THRESHOLD,
+                   ratio = cfg.TRACKER.SIZE_DIST_RATIO)
     # colors = [(0,0,255)]
     colors = []
     

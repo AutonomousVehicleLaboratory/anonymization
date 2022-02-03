@@ -69,6 +69,77 @@ def iou_batch(bb_test, bb_gt):
     + (bb_gt[..., 2] - bb_gt[..., 0]) * (bb_gt[..., 3] - bb_gt[..., 1]) - wh)                                              
   return(o)  
 
+def intersec(bb_test, bb_gt):
+  bb_gt = np.expand_dims(bb_gt, 0)
+  bb_test = np.expand_dims(bb_test, 1)
+  
+  xx1 = np.maximum(bb_test[..., 0], bb_gt[..., 0])
+  yy1 = np.maximum(bb_test[..., 1], bb_gt[..., 1])
+  xx2 = np.minimum(bb_test[..., 2], bb_gt[..., 2])
+  yy2 = np.minimum(bb_test[..., 3], bb_gt[..., 3])
+  w = np.maximum(0., xx2 - xx1)
+  h = np.maximum(0., yy2 - yy1)
+  return w * h
+
+def giou_batch(bb_test, bb_gt):
+  iou = iou_batch(bb_test, bb_gt)
+  test_and_gt = intersec(bb_test, bb_gt)
+  bb_gt = np.expand_dims(bb_gt, 0)
+  bb_test = np.expand_dims(bb_test, 1)
+  test_or_gt = test_and_gt / iou
+  c_x_max = np.maximum(np.maximum(bb_test[..., 0], bb_gt[..., 0]), np.maximum(bb_test[..., 2], bb_gt[..., 2]))
+  c_x_min = np.minimum(np.minimum(bb_test[..., 0], bb_gt[..., 0]), np.minimum(bb_test[..., 2], bb_gt[..., 2]))
+  c_y_max = np.maximum(np.maximum(bb_test[..., 1], bb_gt[..., 1]), np.maximum(bb_test[..., 3], bb_gt[..., 3]))
+  c_y_min = np.minimum(np.minimum(bb_test[..., 1], bb_gt[..., 1]), np.minimum(bb_test[..., 3], bb_gt[..., 3]))
+  area_C = np.absolute((c_x_max - c_x_min) * (c_y_max - c_y_min))
+  giou = np.maximum(0., iou - (area_C - test_or_gt) / area_C)
+  # print("giou: ", giou)
+  # print("iou: ", iou)
+  return giou
+
+def associate_detections_to_trackers_giou(detections,trackers,iou_threshold = 0.3):
+  """
+  Assigns detections to tracked object (both represented as bounding boxes)
+
+  Returns 3 lists of matches, unmatched_detections and unmatched_trackers
+  """
+  if(len(trackers)==0):
+    return np.empty((0,2),dtype=int), np.arange(len(detections)), np.empty((0,5),dtype=int)
+
+  iou_matrix = giou_batch(detections, trackers)
+
+  if min(iou_matrix.shape) > 0:
+    a = (iou_matrix > iou_threshold).astype(np.int32)
+    if a.sum(1).max() == 1 and a.sum(0).max() == 1:
+        matched_indices = np.stack(np.where(a), axis=1)
+    else:
+      matched_indices = linear_assignment(-iou_matrix)
+  else:
+    matched_indices = np.empty(shape=(0,2))
+
+  unmatched_detections = []
+  for d, det in enumerate(detections):
+    if(d not in matched_indices[:,0]):
+      unmatched_detections.append(d)
+  unmatched_trackers = []
+  for t, trk in enumerate(trackers):
+    if(t not in matched_indices[:,1]):
+      unmatched_trackers.append(t)
+
+  #filter out matched with low IOU
+  matches = []
+  for m in matched_indices:
+    if(iou_matrix[m[0], m[1]]<iou_threshold):
+      unmatched_detections.append(m[0])
+      unmatched_trackers.append(m[1])
+    else:
+      matches.append(m.reshape(1,2))
+  if(len(matches)==0):
+    matches = np.empty((0,2),dtype=int)
+  else:
+    matches = np.concatenate(matches,axis=0)
+
+  return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
 def convert_bbox_to_z(bbox):
   """
@@ -202,6 +273,27 @@ def associate_detections_to_trackers(detections,trackers,iou_threshold = 0.3):
 
   return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
+def compute_cost_matrix_center_size(detections, trackers, size_dist_ratio = 0.5):
+  detections = np.array(detections)
+  size_det = np.zeros((detections.shape[0], 2))
+  size_det[:,0] = np.subtract(detections[:,2], detections[:,0])
+  size_det[:,1] = np.subtract(detections[:,3], detections[:,1])
+  size_trk = np.zeros((trackers.shape[0], 2))
+  size_trk[:,0] = np.subtract(trackers[:,2], trackers[:,0])
+  size_trk[:,1] = np.subtract(trackers[:,3], trackers[:,1])
+  center_det = np.zeros((detections.shape[0], 2))
+  center_det[:,0] = np.mean(detections[:,[0,2]], axis=1)
+  center_det[:,1] = np.mean(detections[:,[1,3]], axis=1) 
+  center_trk = np.zeros((trackers.shape[0], 2))
+  center_trk[:,0] = np.mean(trackers[:,[0,2]], axis=1)
+  center_trk[:,1] = np.mean(trackers[:,[1,3]], axis=1)
+  size_factor = np.linalg.norm(size_det.reshape(size_det.shape[0], 1, -1) - size_trk.reshape(1, size_trk.shape[0],-1), axis=2)
+  dist_factor = np.linalg.norm(center_det.reshape(center_det.shape[0], 1, -1) - center_trk.reshape(1, center_trk.shape[0],-1), axis=2)
+  print("size matrix: \n", size_factor)
+  print("dist matrix: \n", dist_factor)
+  distance_matrix = size_dist_ratio * size_factor + (1 - size_dist_ratio) * dist_factor
+  return distance_matrix
+
 
 def compute_cost_matrix_center(detections, trackers):
   detections = np.array(detections)
@@ -215,7 +307,7 @@ def compute_cost_matrix_center(detections, trackers):
     center_trk.reshape(1, center_trk.shape[0],-1), axis=2)
   return distance_matrix
 
-def associate_detections_to_trackers_center(detections,trackers,distance_threshold = 100):
+def associate_detections_to_trackers_center(detections,trackers,distance_threshold = 100, size_dist_ratio = 0.5):
   """
   Assigns detections to tracked object (both represented as bounding boxes)
 
@@ -224,7 +316,7 @@ def associate_detections_to_trackers_center(detections,trackers,distance_thresho
   if(len(trackers)==0):
     return np.empty((0,2),dtype=int), np.arange(len(detections)), np.empty((0,5),dtype=int)
 
-  distance_matrix = compute_cost_matrix_center(detections, trackers)
+  distance_matrix = compute_cost_matrix_center_size(detections, trackers, size_dist_ratio)
 
   if min(distance_matrix.shape) > 0:
     a = (distance_matrix < distance_threshold).astype(np.int32)
@@ -257,11 +349,11 @@ def associate_detections_to_trackers_center(detections,trackers,distance_thresho
   else:
     matches = np.concatenate(matches,axis=0)
 
-    return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
+  return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
 
 class Sort(object):
-  def __init__(self, max_age=10, min_hits=0, iou_threshold=0.3, distance_threshold=100):
+  def __init__(self, max_age=10, min_hits=0, iou_threshold=0.3, distance_threshold=100, ratio = 0.5):
     """
     Sets key parameters for SORT
     """
@@ -269,6 +361,7 @@ class Sort(object):
     self.min_hits = min_hits
     self.iou_threshold = iou_threshold
     self.distance_threshold = distance_threshold
+    self.size_dist_ratio = ratio
     self.trackers = []
     self.frame_count = 0
 
@@ -294,8 +387,8 @@ class Sort(object):
     trks = np.ma.compress_rows(np.ma.masked_invalid(trks))
     for t in reversed(to_del):
       self.trackers.pop(t)
-    matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_center(dets,trks, self.distance_threshold)
-
+    # matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_center(dets,trks, self.distance_threshold, self.size_dist_ratio)
+    matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_giou(dets,trks, self.iou_threshold)
     # update matched trackers with assigned detections
     for m in matched:
       self.trackers[m[1]].update(dets[m[0]])
