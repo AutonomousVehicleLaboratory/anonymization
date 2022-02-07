@@ -138,7 +138,8 @@ def associate_detections_to_trackers_giou(detections,trackers,iou_threshold = 0.
     matches = np.empty((0,2),dtype=int)
   else:
     matches = np.concatenate(matches,axis=0)
-
+  if (len(unmatched_detections) != 0):
+    print("unmatch!")
   return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
 def convert_bbox_to_z(bbox):
@@ -179,7 +180,17 @@ class KalmanBoxTracker(object):
     Initialises a tracker using initial bounding box.
     """
     #define constant velocity model
-    self.kf = KalmanFilter(dim_x=7, dim_z=4) 
+    self.kf = KalmanFilter(dim_x=7, dim_z=4)
+    '''
+    P : ndarray (dim_x, dim_x), default eye(dim_x), covariance matrix
+    Q : ndarray (dim_x, dim_x), default eye(dim_x), Process uncertainty/noise
+    R : ndarray (dim_z, dim_z), default eye(dim_x), measurement uncertainty/noise
+    H : ndarray (dim_z, dim_x), measurement function
+    F : ndarray (dim_x, dim_x), state transistion matrix
+    B : ndarray (dim_x, dim_u), default 0, control transition matrix
+    '''
+ 
+
     self.kf.F = np.array([[1,0,0,0,1,0,0],[0,1,0,0,0,1,0],[0,0,1,0,0,0,1],[0,0,0,1,0,0,0],  [0,0,0,0,1,0,0],[0,0,0,0,0,1,0],[0,0,0,0,0,0,1]])
     self.kf.H = np.array([[1,0,0,0,0,0,0],[0,1,0,0,0,0,0],[0,0,1,0,0,0,0],[0,0,0,1,0,0,0]])
 
@@ -307,7 +318,7 @@ def compute_cost_matrix_center(detections, trackers):
     center_trk.reshape(1, center_trk.shape[0],-1), axis=2)
   return distance_matrix
 
-def associate_detections_to_trackers_center(detections,trackers,distance_threshold = 100, size_dist_ratio = 0.5):
+def associate_detections_to_trackers_center(detections,trackers,distance_threshold = 100):
   """
   Assigns detections to tracked object (both represented as bounding boxes)
 
@@ -316,8 +327,8 @@ def associate_detections_to_trackers_center(detections,trackers,distance_thresho
   if(len(trackers)==0):
     return np.empty((0,2),dtype=int), np.arange(len(detections)), np.empty((0,5),dtype=int)
 
-  distance_matrix = compute_cost_matrix_center_size(detections, trackers, size_dist_ratio)
-
+  # distance_matrix = compute_cost_matrix_center_size(detections, trackers, size_dist_ratio)
+  distance_matrix = compute_cost_matrix_center(detections, trackers)
   if min(distance_matrix.shape) > 0:
     a = (distance_matrix < distance_threshold).astype(np.int32)
     if a.sum(1).max() == 1 and a.sum(0).max() == 1:
@@ -387,8 +398,8 @@ class Sort(object):
     trks = np.ma.compress_rows(np.ma.masked_invalid(trks))
     for t in reversed(to_del):
       self.trackers.pop(t)
-    # matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_center(dets,trks, self.distance_threshold, self.size_dist_ratio)
-    matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_giou(dets,trks, self.iou_threshold)
+    matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_center(dets,trks, self.distance_threshold)
+    # matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_giou(dets,trks, self.iou_threshold)
     # update matched trackers with assigned detections
     for m in matched:
       self.trackers[m[1]].update(dets[m[0]])
