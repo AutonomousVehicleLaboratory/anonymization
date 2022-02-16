@@ -1,0 +1,5 @@
+*.pyc
+weights/*
+.vscode
+*.avi
+henry.yaml
