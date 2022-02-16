@@ -2,4 +2,4 @@
 *.avi
 henry.yaml
 weights/*
-.vscode
+.vscode/*
