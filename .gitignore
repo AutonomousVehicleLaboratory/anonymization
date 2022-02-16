@@ -1,5 +1,6 @@
 *.pyc
-weights/*
-.vscode
 *.avi
 henry.yaml
+weights/*
+.vscode/*
+.DS_Store
