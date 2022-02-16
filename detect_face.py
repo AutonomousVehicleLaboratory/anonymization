@@ -22,6 +22,7 @@ from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 from tracker.sort import Sort
 from config.base_config_detect_face import get_cfg_defaults
+from draw_pifpaf import draw_skeleton
 
 
 def load_model(weights, device):
@@ -88,60 +89,6 @@ def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
     tf = max(tl - 1, 1)  # font thickness
     label = str(conf)[:5]
     cv2.putText(img, label, (x1, y1 - 2), 0, tl / 2, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
-    return img
-
-COCO_PERSON_SKELETON = [
-    (16, 14), (14, 12), (17, 15), (15, 13), (12, 13), (6, 12), (7, 13),
-    (6, 7), (6, 8), (7, 9), (8, 10), (9, 11), (2, 3), (1, 2), (1, 3),
-    (2, 4), (3, 5), (4, 6), (5, 7),
-]
-
-
-KINEMATIC_TREE_SKELETON = [
-    (1, 2), (2, 4),  # left head
-    (1, 3), (3, 5),
-    (1, 6),
-    (6, 8), (8, 10),  # left arm
-    (1, 7),
-    (7, 9), (9, 11),  # right arm
-    (6, 12), (12, 14), (14, 16),  # left side
-    (7, 13), (13, 15), (15, 17),
-]
-COCO_KEYPOINTS = [
-    'nose',            # 1
-    'left_eye',        # 2
-    'right_eye',       # 3
-    'left_ear',        # 4
-    'right_ear',       # 5
-    'left_shoulder',   # 6
-    'right_shoulder',  # 7
-    'left_elbow',      # 8
-    'right_elbow',     # 9
-    'left_wrist',      # 10
-    'right_wrist',     # 11
-    'left_hip',        # 12
-    'right_hip',       # 13
-    'left_knee',       # 14
-    'right_knee',      # 15
-    'left_ankle',      # 16
-    'right_ankle',     # 17
-]
-
-def draw_pifpaf(img, pifpaf_keypoints):
-    # keypoints = ['nose','left_eye','right_eye','left_ear','right_ear','left_shoulder','right_shoulder','left_elbow','right_elbow','left_wrist','right_wrist','left_hip','right_hip','left_knee', 'right_knee', 'left_ankle','right_ankle']
-    # POSE_PAIRS = get_limbs_from_keypoints(keypoints)
-    pp_kps = pifpaf_keypoints.reshape(-1,3)
-    # print(pp_kps)
-    for pair in KINEMATIC_TREE_SKELETON:
-        partA = pair[0] -1
-        partB = pair[1] -1
-        # print("A: ", pp_kps[partA,2].shape)
-        # print("B: ", pp_kps[partB,:2])
-        # print("Zero: ", np.zeros((2,)))
-        if  np.isclose(pp_kps[partA, 2],  0) or np.isclose(pp_kps[partB, 2],  0):
-            pass
-        else:
-            cv2.line(img, pp_kps[partA,:2].astype(int), pp_kps[partB,:2].astype(int), (0, 255, 255), 2)
     return img
 
 def view_tracking_with_history(img_list, display_crop = False):
@@ -676,7 +623,7 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
         pifpaf_dict = {}
     
     if write_video:
-        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_w_pifpaf.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
+        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_pifpaf_only.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
     if display_results:
         cv2.namedWindow("Tracking", cv2.WND_PROP_FULLSCREEN)
 
@@ -703,6 +650,7 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
             print('use saved detection')
             dets = []
             image_det = detection_dict[image_path]
+            pifpaf_det = pifpaf_dict[image_path]
             for det_dict in image_det:
                 xywh = det_dict['xywh']
                 conf = det_dict['conf']
@@ -710,18 +658,18 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
                 class_num = det_dict['class_num']
                 xyxyconf = det_dict['xyxyconf']
                 dets.append(xyxyconf)
-                orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
-            pifpaf_det = pifpaf_dict[image_path]
-            for pp_dict in pifpaf_det:
-                pp_kps = np.asarray(pp_dict['keypoints'])
-                orgimg = draw_pifpaf(orgimg, pp_kps)
+                # orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
+            if (cfg.DISPLAY_PIFPAF):
+                for pp_dict in pifpaf_det:
+                    pp_kps = np.asarray(pp_dict['keypoints'])
+                    orgimg = draw_skeleton(orgimg, pp_kps, cfg.PREDICT_PIFPAF_HEAD)
         else:
             print("missing prediction for image", image_path)
 
 
         # update tracker
         tracking_res = tracker.update(dets)
-        orgimg = show_tracking(orgimg, tracking_res, colors)
+        # orgimg = show_tracking(orgimg, tracking_res, colors)
         print(image_path+" done")
         img_list.append(orgimg)
 

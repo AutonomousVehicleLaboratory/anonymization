@@ -31,9 +31,13 @@ _C.SAVE_DIR = '/Users/morris/Desktop/anonymization/output_dir/avt_cameras_camera
 
 _C.TRACK_ONLY = True
 
-_C.WRITE_VIDEO = True
+_C.WRITE_VIDEO = False
 
-_C.DISPLAY_RESULTS = False
+_C.DISPLAY_RESULTS = True
+
+# openpifpaf config
+_C.DISPLAY_PIFPAF = True
+_C.PREDICT_PIFPAF_HEAD = True
 
 # Crop the upper part of the displayed image for better visualization
 _C.DISPLAY_CROP = False
