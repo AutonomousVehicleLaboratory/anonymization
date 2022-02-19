@@ -21,6 +21,7 @@ general_keyareas["hip"] = [11,12]
 general_keyareas["knee"] = [13,14]
 general_keyareas['ankle'] = [15,16]
 general_keyareas['eye'] = [2,3]
+general_keyareas['torso'] = [5,6,11,12]
 
 KINEMATIC_TREE_SKELETON = [
     (1, 2), (2, 4),  # left head
@@ -102,8 +103,8 @@ def get_joint_coor(joint_name, pp_kps):
     return np.array([res_x, res_y])
 
 def joint_exist(joint_name, pp_kps, all_exist=False):
-    general_terms = ["face", "shoulder", "hip", "knee", "ankle", "eye"]
-    if joint_name in general_terms:
+    # general_terms = ["face", "shoulder", "hip", "knee", "ankle", "eye"]
+    if joint_name in general_keyareas.keys():
         num_limit = len(general_keyareas[joint_name])//2
         if all_exist:
             num_limit = 0
@@ -114,51 +115,68 @@ def joint_exist(joint_name, pp_kps, all_exist=False):
         if np.isclose(pp_kps[index_joint, 2], 0):
             return False
     return True
-
+# change to voting method
 def get_human_height(pp_kps):
-    nose2shoulder, shoulder2hip, hip2knee, knee2ankle = 0, 0, 0, 0
+    n_s_to_h_ratio, torso_to_h_ratio, hip_knee_to_h_ratio, knee_ankle_to_h_ratio = 0.12, 0.3,  0.25, 0.25
+    predicted_height = []
+    height = 0
     if joint_exist("nose", pp_kps) and joint_exist("shoulder", pp_kps):
         nose2shoulder = np.linalg.norm(get_joint_coor("shoulder", pp_kps) - pp_kps[0,:2])
+        predicted_height.append(nose2shoulder/n_s_to_h_ratio)
     if joint_exist("hip", pp_kps) and joint_exist("shoulder", pp_kps):
         shoulder2hip = np.linalg.norm(get_joint_coor("hip", pp_kps) - get_joint_coor("shoulder", pp_kps))
+        predicted_height.append(shoulder2hip / torso_to_h_ratio)
     if joint_exist("hip", pp_kps) and joint_exist("knee", pp_kps):
         hip2knee = np.linalg.norm(get_joint_coor("knee", pp_kps) - get_joint_coor("hip", pp_kps))
-    if joint_exist("nose", pp_kps) and joint_exist("shoulder", pp_kps):
+        predicted_height.append(hip2knee / hip_knee_to_h_ratio)
+    if joint_exist("ankle", pp_kps) and joint_exist("knee", pp_kps):
         knee2ankle = np.linalg.norm(get_joint_coor("ankle", pp_kps) - get_joint_coor("knee", pp_kps))
-    return nose2shoulder + shoulder2hip + hip2knee + knee2ankle
+        predicted_height.append(knee2ankle / knee_ankle_to_h_ratio)
+    # print(predicted_height)
+    if predicted_height:
+        height = np.median(np.array(predicted_height))
+    else:
+        print("=====error======")
+    return height
 
 
 
 def generate_head_bbox(img, pp_kps):
     head_shoulder_ratio = 1/4
-    # if head exist, create a bbox
-    # if shoulder exist, create a predicted bbox
-    # ==== fix side people issue====
-    if joint_exist("eye", pp_kps) or joint_exist("nose", pp_kps):
-        max_shoulder_x, min_shoulder_x = np.amin(pp_kps[5:7, 0]).astype(int), np.amax(pp_kps[5:7, 0]).astype(int)
-        head_bbox_x1, head_bbox_x2 = int((1 - head_shoulder_ratio) * min_shoulder_x + head_shoulder_ratio * max_shoulder_x), int(head_shoulder_ratio * min_shoulder_x + (1 - head_shoulder_ratio) * max_shoulder_x)
-        head_bbox_y1, head_bbox_y2 = 0, 0
-        if joint_exist("eye", pp_kps):
-            # print("eye exist! ", pp_kps[1:3,:])
-            head_bbox_y2 = int((get_joint_coor("eye", pp_kps)[1] + get_joint_coor("shoulder", pp_kps)[1])/2)
-            head_bbox_y1 = int(2*get_joint_coor("eye", pp_kps)[1] - head_bbox_y2)
+    torso_length_head_width_ratio = 1/2
+    head_aspect_ratio = 1.2
+    if joint_exist("face", pp_kps)  and joint_exist("shoulder", pp_kps):
+        head_width = 0
+        # max_shoulder_x, min_shoulder_x = np.amin(pp_kps[5:7, 0]).astype(int), np.amax(pp_kps[5:7, 0]).astype(int)
+        # head_bbox_x1, head_bbox_x2 = int((1 - head_shoulder_ratio) * min_shoulder_x + head_shoulder_ratio * max_shoulder_x), int(head_shoulder_ratio * min_shoulder_x + (1 - head_shoulder_ratio) * max_shoulder_x)
+        head_middle_coor = get_joint_coor('face', pp_kps)
+        
+        if joint_exist("hip", pp_kps):
+            head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
+        elif joint_exist("shoulder", pp_kps, all_exist=True):
+            head_width = (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
         else:
-            # nose
-            print("nose exist! ", pp_kps[0,:])
-            head_bbox_y2 = int((pp_kps[0,1] + get_joint_coor("shoulder", pp_kps)[1]) /2)
-            head_bbox_y1 = int(2*pp_kps[0,1] - head_bbox_y2)
-
+            head_width = get_joint_coor("shoulder", pp_kps)[1] - get_joint_coor("face", pp_kps)[1]
+        head_bbox_x1, head_bbox_x2 = int(head_middle_coor[0] - head_width/2), int(head_middle_coor[0] + head_width/2)
+        head_bbox_y1, head_bbox_y2 = int(head_middle_coor[1] - head_width * head_aspect_ratio/2), int(head_middle_coor[1] + head_width * head_aspect_ratio/2)
         # print("xyxy: ", head_bbox_x1, head_bbox_y1, head_bbox_x2, head_bbox_y2)
         # print((head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2) )
         cv2.rectangle(img, (head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2), (0, 0, 255), 2)
     elif joint_exist("shoulder", pp_kps, all_exist=True):
-        print("shoulder only")
-        # the width of the head is about 1/3 the shoulder's width
-        min_shoulder_x, max_shoulder_x = np.amin(pp_kps[5:7, 0]).astype(int), np.amax(pp_kps[5:7, 0]).astype(int)
-        pred_head_bbox_x1, pred_head_bbox_x2 = int((1 - head_shoulder_ratio) * min_shoulder_x + head_shoulder_ratio * max_shoulder_x), int(head_shoulder_ratio * min_shoulder_x + (1 - head_shoulder_ratio) * max_shoulder_x)
+        # 
+        head_middle_x, head_width  = get_joint_coor("shoulder", pp_kps)[0], (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
+        head_height = head_width * head_aspect_ratio
+        if joint_exist("hip", pp_kps):
+            head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
+        pred_head_bbox_x1, pred_head_bbox_x2 = int(head_middle_x - head_width/2), int(head_middle_x + head_width/2)
         # human height is around 6~8 head high, take average 7
-        pred_head_bbox_y1 = int(get_joint_coor("shoulder", pp_kps)[1] - get_human_height(pp_kps) / 7)
-        pred_head_bbox_y2 = get_joint_coor("shoulder", pp_kps)[1]
-        print("predicted xyxy: ",pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2)
+        # pred_head_bbox_y1 = int(get_joint_coor("shoulder", pp_kps)[1] - (pred_head_bbox_x2 - pred_head_bbox_x1))
+        pred_human_height = get_human_height(pp_kps)
+        if pred_human_height!=0:
+            head_height = pred_human_height / 5.5
+        pred_head_bbox_y2 = int(get_joint_coor("shoulder", pp_kps)[1])
+        pred_head_bbox_y1 = int(pred_head_bbox_y2 - head_height)
+        # print("predicted xyxy: ",pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2)
         cv2.rectangle(img, (pred_head_bbox_x1, pred_head_bbox_y1), (pred_head_bbox_x2, pred_head_bbox_y2), (255, 0, 0), 2)
+    # else, get body left most and right most
     return img
