@@ -642,7 +642,7 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
     
     img_list = []
     for image_path in image_paths:
-        orgimg = cv2.imread(image_dir+image_path)  # BGR
+        orgimg = cv2.imread(os.path.join(image_dir, image_path))  # BGR
         img0 = copy.deepcopy(orgimg)
         assert orgimg is not None, 'Image Not Found ' + image_path
         
