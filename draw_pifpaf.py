@@ -84,23 +84,22 @@ def get_body_bbox(pp_kps):
     return np.array([min_x, min_y, max_x, max_y])
 
 def get_joint_coor(joint_name, pp_kps):
-    res_x, res_y = 0, 0
+    res_x, res_y, conf = 0, 0, 0
     count = 0
-    # ======0212 zero issue!======
-    # if joint_exist(joint_name, pp_kps):
-    #     pass
     for i in general_keyareas[joint_name]:
         if (np.isclose(pp_kps[i,2], 0)):
             pass
         else:
             res_x += pp_kps[i,0]
             res_y += pp_kps[i,1]
+            conf += pp_kps[i,2]
             count += 1
     if count == 0:
         return np.array([0,0])
     res_x = int(res_x/count)
     res_y = int(res_y/count)
-    return np.array([res_x, res_y])
+    conf /= count
+    return np.array([res_x, res_y, conf])
 
 def joint_exist(joint_name, pp_kps, all_exist=False):
     # general_terms = ["face", "shoulder", "hip", "knee", "ankle", "eye"]
@@ -135,21 +134,18 @@ def get_human_height(pp_kps):
     # print(predicted_height)
     if predicted_height:
         height = np.median(np.array(predicted_height))
-    else:
-        print("=====error======")
     return height
 
 
 
 def generate_head_bbox(img, pp_kps):
-    head_shoulder_ratio = 1/4
     torso_length_head_width_ratio = 1/2
     head_aspect_ratio = 1.2
     if joint_exist("face", pp_kps)  and joint_exist("shoulder", pp_kps):
         head_width = 0
         # max_shoulder_x, min_shoulder_x = np.amin(pp_kps[5:7, 0]).astype(int), np.amax(pp_kps[5:7, 0]).astype(int)
         # head_bbox_x1, head_bbox_x2 = int((1 - head_shoulder_ratio) * min_shoulder_x + head_shoulder_ratio * max_shoulder_x), int(head_shoulder_ratio * min_shoulder_x + (1 - head_shoulder_ratio) * max_shoulder_x)
-        head_middle_coor = get_joint_coor('face', pp_kps)
+        head_middle_coor = get_joint_coor('face', pp_kps)[:2]
         
         if joint_exist("hip", pp_kps):
             head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
@@ -180,3 +176,64 @@ def generate_head_bbox(img, pp_kps):
         cv2.rectangle(img, (pred_head_bbox_x1, pred_head_bbox_y1), (pred_head_bbox_x2, pred_head_bbox_y2), (255, 0, 0), 2)
     # else, get body left most and right most
     return img
+
+def predict_and_save():
+    save_dir = '/Users/morris/Desktop/anonymization/output_dir/avt_cameras_camera6/'
+    pifpaf_path = os.path.join(save_dir, 'detection_pifpaf.json')
+    torso_length_head_width_ratio = 1/2
+    head_aspect_ratio = 1.2
+    detection_dict = {}
+    with open(pifpaf_path) as fpif:
+        pifpaf_dict = json.load(fpif)
+    for img_dest, pp_dicts in pifpaf_dict.items():
+        image_pred = []
+        for pp_dict in pp_dicts:
+            pp_kps = np.asarray(pp_dict['keypoints'])
+            pp_kps = pp_kps.reshape(-1,3)
+            if joint_exist("face", pp_kps)  and joint_exist("shoulder", pp_kps):
+                head_width = 0
+                # max_shoulder_x, min_shoulder_x = np.amin(pp_kps[5:7, 0]).astype(int), np.amax(pp_kps[5:7, 0]).astype(int)
+                # head_bbox_x1, head_bbox_x2 = int((1 - head_shoulder_ratio) * min_shoulder_x + head_shoulder_ratio * max_shoulder_x), int(head_shoulder_ratio * min_shoulder_x + (1 - head_shoulder_ratio) * max_shoulder_x)
+                head_middle_coor = get_joint_coor('face', pp_kps)[:2]
+                conf = 0
+                if joint_exist("hip", pp_kps):
+                    head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
+                    conf = (get_joint_coor("hip",pp_kps)[2] + get_joint_coor("shoulder",pp_kps)[2]) /2
+                elif joint_exist("shoulder", pp_kps, all_exist=True):
+                    head_width = (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
+                    conf = np.mean(pp_kps[5:7,2])
+                else:
+                    head_width = get_joint_coor("shoulder", pp_kps)[1] - get_joint_coor("face", pp_kps)[1]
+                    conf = (get_joint_coor("shoulder", pp_kps)[2] + get_joint_coor("face", pp_kps)[2])/2
+                head_bbox_x1, head_bbox_x2 = int(head_middle_coor[0] - head_width/2), int(head_middle_coor[0] + head_width/2)
+                head_bbox_y1, head_bbox_y2 = int(head_middle_coor[1] - head_width * head_aspect_ratio/2), int(head_middle_coor[1] + head_width * head_aspect_ratio/2)
+                det_dict = {"xyxyconf": [head_bbox_x1, head_bbox_y1, head_bbox_x2, head_bbox_y2, round(conf, 4)]}
+                image_pred.append(det_dict)
+                # print("xyxy: ", head_bbox_x1, head_bbox_y1, head_bbox_x2, head_bbox_y2)
+                # print((head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2) )
+                
+            elif joint_exist("shoulder", pp_kps, all_exist=True):
+                # 
+                head_middle_x, head_width  = get_joint_coor("shoulder", pp_kps)[0], (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
+                head_height = head_width * head_aspect_ratio
+                conf = get_joint_coor("shoulder", pp_kps)[2]
+                if joint_exist("hip", pp_kps):
+                    head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
+                    conf = (get_joint_coor("hip",pp_kps)[2] + get_joint_coor("shoulder",pp_kps)[2]) /2
+                pred_head_bbox_x1, pred_head_bbox_x2 = int(head_middle_x - head_width/2), int(head_middle_x + head_width/2)
+                # human height is around 6~8 head high, take average 7
+                # pred_head_bbox_y1 = int(get_joint_coor("shoulder", pp_kps)[1] - (pred_head_bbox_x2 - pred_head_bbox_x1))
+                pred_human_height = get_human_height(pp_kps)
+                if pred_human_height!=0:
+                    head_height = pred_human_height / 5.5
+                pred_head_bbox_y2 = int(get_joint_coor("shoulder", pp_kps)[1])
+                pred_head_bbox_y1 = int(pred_head_bbox_y2 - head_height)
+                det_dict = {"xyxyconf": [pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2, round(conf, 4)]}
+                image_pred.append(det_dict)
+        detection_dict[img_dest] = image_pred
+        # print("predicted xyxy: ",pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2)
+    with open(os.path.join(save_dir, "pifpaf_pred_head.json"), 'w') as f:
+        json.dump(detection_dict, f)
+    print("head prediction saved!")
+if __name__ == '__main__':
+    predict_and_save()
