@@ -611,13 +611,15 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
 
     detection_path = os.path.join(save_dir, 'detection.json')
     pifpaf_path = os.path.join(save_dir, 'detection_pifpaf.json')
-
+    pred_head_path = os.path.join(save_dir, 'pifpaf_pred_head.json')
     if os.path.exists(detection_path):
         print("Loading detection result file")
         with open(detection_path) as fp:
             detection_dict = json.load(fp)
         with open(pifpaf_path) as fpif:
             pifpaf_dict = json.load(fpif)
+        with open(pred_head_path) as fpred:
+            pred_head_dict = json.load(fpred)
     else:
         detection_dict = {}
         pifpaf_dict = {}
@@ -651,25 +653,31 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
             dets = []
             image_det = detection_dict[image_path]
             pifpaf_det = pifpaf_dict[image_path]
-            for det_dict in image_det:
-                xywh = det_dict['xywh']
-                conf = det_dict['conf']
-                landmarks = det_dict['landmarks']
-                class_num = det_dict['class_num']
-                xyxyconf = det_dict['xyxyconf']
-                dets.append(xyxyconf)
-                # orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
+            pif_paf_pred = pred_head_dict[image_path]
+            
             if (cfg.DISPLAY_PIFPAF):
                 for pp_dict in pifpaf_det:
                     pp_kps = np.asarray(pp_dict['keypoints'])
                     orgimg = draw_skeleton(orgimg, pp_kps, cfg.PREDICT_PIFPAF_HEAD)
+                for pred_dict in pif_paf_pred:
+                    xyxyconf = pred_dict['xyxyconf']
+                    dets.append(xyxyconf)
+            else:
+                for det_dict in image_det:
+                    xywh = det_dict['xywh']
+                    conf = det_dict['conf']
+                    landmarks = det_dict['landmarks']
+                    class_num = det_dict['class_num']
+                    xyxyconf = det_dict['xyxyconf']
+                    dets.append(xyxyconf)
+                    # orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
         else:
             print("missing prediction for image", image_path)
 
 
         # update tracker
         tracking_res = tracker.update(dets)
-        # orgimg = show_tracking(orgimg, tracking_res, colors)
+        orgimg = show_tracking(orgimg, tracking_res, colors)
         print(image_path+" done")
         img_list.append(orgimg)
 
