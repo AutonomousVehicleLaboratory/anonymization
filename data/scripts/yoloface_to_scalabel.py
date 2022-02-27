@@ -43,24 +43,24 @@ def generate_frame(index, name, rel_path, frame_label, image_size):
     frame['url'] = os.path.join(rel_path, name)
 
     # videoName
-    frame['videoName'] = ""
+    frame['videoName'] = "0"
     # attributes
     # frame['attributes'] = 'null' 
     # timestamp
     # frameIndex
-    frame['index'] = index
-    # size
-    # frame['size'] = {'height': image_size[0], 
-    #                  'width': image_size[1]}
+    # frame['index'] = index
+    # # size
+    # # frame['size'] = {'height': image_size[0], 
+    # #                  'width': image_size[1]}
 
-    # labels
-    frame['labels'] = []
-    # labels[key][id]{'xywh', 'conf', 'landmarks', 'class_num', 'xyxyconf'}
-    for i in range(len(frame_label)):
-        # frame['labels'].append(cur_annotation)
-        frame['labels'].append(generate_2dlabel(i, frame_label[i]['xywh'], image_size[1], image_size[0]))
+    # # labels
+    # frame['labels'] = []
+    # # labels[key][id]{'xywh', 'conf', 'landmarks', 'class_num', 'xyxyconf'}
+    # for i in range(len(frame_label)):
+    #     # frame['labels'].append(cur_annotation)
+    #     frame['labels'].append(generate_2dlabel(i, frame_label[i]['xywh'], image_size[1], image_size[0]))
 
-
+    # frame['sensor'] = -1
 
     return frame
 
@@ -95,6 +95,9 @@ def save_labels(output_labels, output_dir):
         json.dump(output_labels, output_file, indent=2)
 
 if __name__=="__main__":
-    processed_labels = load_yolo("/path/to/yolo_detections.json", "/items/images/camera6")
-    save_labels(processed_labels, "/path/to/dest")
+    detection_path = "../../output_dir/avt_cameras_camera6/detection.json" # path to yolo detection
+    image_src = "http://localhost:8686/items/avt_cameras_camera6_image_color_compressed/"
+    dest_dir = "../../output_dir/avt_cameras_camera6/"
+    processed_labels = load_yolo(detection_path, image_src)
+    save_labels(processed_labels, dest_dir)
     # json.dumps(processed_labels, indent=2)

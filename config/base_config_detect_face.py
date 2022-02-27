@@ -37,10 +37,10 @@ _C.DISPLAY_RESULTS = True
 
 # openpifpaf config
 _C.DISPLAY_PIFPAF = True
-_C.PREDICT_PIFPAF_HEAD = True
+_C.PREDICT_PIFPAF_HEAD = False
 
 # Crop the upper part of the displayed image for better visualization
-_C.DISPLAY_CROP = False
+_C.DISPLAY_CROP = True
 
 # YOLOv5Face parameters
 
