@@ -157,6 +157,17 @@ def draw_labels(img, labels):
             color,
             thickness=2)
 
+def draw_detections(img, detections):
+    for det in detections:
+        color = (255,0,0)
+        box = det['xyxyconf']
+        cv2.rectangle(
+            img, 
+            (int(box[0]), int(box[1])),
+            (int(box[2]), int(box[3])),
+            color,
+            thickness=2)
+
 
 def filter_small_objects(
     label_dict, 
@@ -186,29 +197,30 @@ def filter_small_objects(
         label_dict[name] = new_labels
 
         # Filter YOLOv5 Detection
-        dets = detections[name]
-        new_dets = []
-        for det in dets:
-            box = det['xyxyconf']
-            max_dim = max((box[2] - box[0]), (box[3] - box[1]))
-            if max_dim > threshold_max_dim:
-                new_dets.append(det)
-        detections[name] = new_dets
+        # dets = detections[name]
+        # new_dets = []
+        # for det in dets:
+        #     box = det['xyxyconf']
+        #     max_dim = max((box[2] - box[0]), (box[3] - box[1]))
+        #     if max_dim > threshold_max_dim:
+        #         new_dets.append(det)
+        # detections[name] = new_dets
 
         # Filter OpenPifPaf detection
-        dets = det_pifpaf_head[name]
-        new_dets = []
-        for det in dets:
-            box = det['xyxyconf']
-            max_dim = max((box[2] - box[0]), (box[3] - box[1]))
-            if max_dim > threshold_max_dim:
-                new_dets.append(det)
-        det_pifpaf_head[name] = new_dets        
+        # dets = det_pifpaf_head[name]
+        # new_dets = []
+        # for det in dets:
+        #     box = det['xyxyconf']
+        #     max_dim = max((box[2] - box[0]), (box[3] - box[1]))
+        #     if max_dim > threshold_max_dim:
+        #         new_dets.append(det)
+        # det_pifpaf_head[name] = new_dets        
 
         if viz:
             image_path = os.path.join(image_dir, name)
             img = cv2.imread(image_path)
             draw_labels(img, new_labels)
+            draw_detections(dets)
             cv2.imshow("Label", img)
             cv2.waitKey(0)
     
@@ -244,20 +256,28 @@ def evaluate_two_labels(
         cv2.namedWindow("Label", cv2.WND_PROP_FULLSCREEN)
 
     tp_count, fp_count, fn_count = 0, 0, 0
+    afh_mfh_count = 0
+    afh_mf_count = 0
+    afh_mh_count = 0
+    afh_mn_count = 0 # detection, associated with head and face, but not matched
+    ah_mh_count = 0
+    ah_mn_count = 0
+    an_count = 0
+    nfh_count = 0 # no detection, but head has face
 
     for name in labels:
         dets_xyxy, det_scores = format_detections(detections[name])
         label_face_xyxy, label_head_xyxy = format_two_labels( labels[name])
 
         # match detection with head labels
-        matches_det_head, unmatched_dets, unmatched_heads = associate_detections_to_labels(
+        matches_det_head, unmatched_dets, unmatched_heads_det = associate_detections_to_labels(
             label_head_xyxy, 
             dets_xyxy,
             distance_threshold=0.1,
             distance_method="2diouxyxy")
 
         # match face label with head labels
-        matches_face_head, unmatched_faces, unmatched_heads = associate_detections_to_labels(
+        matches_face_head, unmatched_faces, unmatched_heads_face = associate_detections_to_labels(
             label_head_xyxy, 
             label_face_xyxy,
             distance_threshold=0.1,
@@ -276,42 +296,72 @@ def evaluate_two_labels(
                 face_ratio = get_ratio(det_xyxy, face_xyxy)
                 if face_ratio > threshold_face and head_ratio > threshold_head:
                     tp_count = tp_count + 1
+                    afh_mfh_count = afh_mfh_count + 1
+                elif face_ratio > threshold_face:
+                    afh_mf_count = afh_mf_count + 1
+                elif head_ratio > threshold_head:
+                    afh_mh_count = afh_mh_count + 1
                 else:
+                    afh_mn_count = afh_mn_count + 1
                     fp_count = fp_count + 1
                     fn_count = fn_count + 1
             else:
-                pass
                 if head_ratio > threshold_head:
-                    tp_count = tp_count + 1
+                    ah_mh_count = ah_mh_count + 1
                 else:
-                    fp_count = fp_count + 1
+                    ah_mn_count = ah_mn_count + 1
                 # When face doesn't exist in the label for a corresponding head,
                 # We can ignore the head detection
-        for head_idx in unmatched_heads:
+        
+        # If a head is not associated with detection,
+        # It is considerered wrong only when it has a face
+        for head_idx in unmatched_heads_det:
             if head_idx in head_to_face_dict:
                 fn_count = fn_count + 1
+                nfh_count = nfh_count + 1
 
         fp_count = fp_count + len(unmatched_dets)
+        an_count = an_count + len(unmatched_dets)
 
         if verbose:
-            print('tp:', tp_count, 'fp:', fp_count, 'fn:', fn_count)
-
-        if len(unmatched_faces) > 0:
+            print(
+                'tp:', tp_count, 
+                'fp:', fp_count, 
+                'fn:', fn_count,
+                'afh_mfh', afh_mfh_count,
+                'afh_mf', afh_mf_count,
+                'afh_mh', afh_mh_count,
+                'afh_mn', afh_mn_count,
+                'ah_mh', ah_mh_count,
+                'ah_mn', ah_mn_count,
+                'an', an_count,
+                'nfh', nfh_count)
+        # if len(unmatched_faces) > 0:
             # print("Error: A face label doesn't come with head label")
-            if viz:
-                cv2.namedWindow("Label", cv2.WND_PROP_FULLSCREEN)
-                image_path = os.path.join(image_dir, name)
-                img = cv2.imread(image_path)
-                draw_labels(img, labels[name])
-                cv2.imshow("Label", img)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
-
+        if viz:
+            image_path = os.path.join(image_dir, name)
+            img = cv2.imread(image_path)
+            draw_labels(img, labels[name])
+            draw_detections(img, detections[name])
+            cv2.imshow("Label", img)
+            cv2.waitKey(0)
+    
+    if viz:
+        cv2.destroyAllWindows()
+    
     print('thres_face:', threshold_face,
           'thres_head:', threshold_head,
           'tp:', tp_count, 
           'fp:', fp_count, 
-          'fn:', fn_count)
+          'fn:', fn_count,
+          'afh_mfh', afh_mfh_count,
+          'afh_mf', afh_mf_count,
+          'afh_mh', afh_mh_count,
+          'afh_mn', afh_mn_count,
+          'ah_mh', ah_mh_count,
+          'ah_mn', ah_mn_count,
+          'an', an_count,
+          'nfh', nfh_count)
 
 
 def parse_args():
@@ -386,6 +436,7 @@ if __name__ == '__main__':
         viz=False,
         verbose=False
     )
+
     # evaluate_detection(
     #     detections, 
     #     label_dict, 
