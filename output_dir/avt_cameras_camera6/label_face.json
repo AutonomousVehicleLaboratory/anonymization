@@ -322,7 +322,10 @@
         {
           "id": "bZYK592QavaQwBDT",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1796.873226415626,
@@ -374,7 +377,10 @@
         {
           "id": "bZYK592QavaQwBDT",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1788.9738613137213,
@@ -426,7 +432,10 @@
         {
           "id": "bZYK592QavaQwBDT",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1781.0744962118167,
@@ -780,7 +789,10 @@
         {
           "id": "diD094DieHCuk1wF",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1914.3946093841503,
@@ -846,7 +858,10 @@
         {
           "id": "diD094DieHCuk1wF",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1913.569360549765,
@@ -899,12 +914,12 @@
           "id": "VYTsRByxTg0VQVCp",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1795.1880130382683,
-            "x2": 1815.1851628600332,
-            "y1": 771.9144107450265,
-            "y2": 798.2352346651338
+            "x1": 1784.9155568858312,
+            "x2": 1807.6639366907173,
+            "y1": 772.3352363024796,
+            "y2": 799.5223243619778
           },
           "poly2d": null,
           "box3d": null
@@ -912,13 +927,16 @@
         {
           "id": "diD094DieHCuk1wF",
           "category": "face",
-          "attributes": {},
-          "manualShape": false,
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
+          "manualShape": true,
           "box2d": {
             "x1": 1912.7441117153799,
             "x2": 1918.7487015044414,
-            "y1": 755.5553084168303,
-            "y2": 772.1142590393831
+            "y1": 757.3545959431643,
+            "y2": 773.4449133661326
           },
           "poly2d": null,
           "box3d": null
@@ -965,12 +983,12 @@
           "id": "VYTsRByxTg0VQVCp",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1799.1810607802875,
-            "x2": 1818.3691413649165,
-            "y1": 772.0555712377263,
-            "y2": 798.4512416421741
+            "x1": 1790.4639422040962,
+            "x2": 1812.657483477156,
+            "y1": 776.2191060252651,
+            "y2": 803.4061940847632
           },
           "poly2d": null,
           "box3d": null
@@ -978,13 +996,16 @@
         {
           "id": "diD094DieHCuk1wF",
           "category": "face",
-          "attributes": {},
-          "manualShape": false,
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
+          "manualShape": true,
           "box2d": {
-            "x1": 1911.9188628809945,
-            "x2": 1918.242209725252,
-            "y1": 755.5734052419162,
-            "y2": 772.1547916700989
+            "x1": 1909.7542265467923,
+            "x2": 1919.1864815878428,
+            "y1": 760.6836271341232,
+            "y2": 776.7739445570916
           },
           "poly2d": null,
           "box3d": null
@@ -1031,12 +1052,12 @@
           "id": "VYTsRByxTg0VQVCp",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1803.1741085223066,
-            "x2": 1821.5531198697997,
-            "y1": 772.196731730426,
-            "y2": 798.6672486192142
+            "x1": 1794.3478119268816,
+            "x2": 1816.5413531999413,
+            "y1": 774.5545904297855,
+            "y2": 798.9674858301513
           },
           "poly2d": null,
           "box3d": null
@@ -1044,13 +1065,16 @@
         {
           "id": "diD094DieHCuk1wF",
           "category": "face",
-          "attributes": {},
-          "manualShape": false,
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
+          "manualShape": true,
           "box2d": {
-            "x1": 1911.0936140466092,
+            "x1": 1908.0897109513128,
             "x2": 1917.7357179460626,
-            "y1": 755.5915020670022,
-            "y2": 772.1953243008147
+            "y1": 760.6836271341232,
+            "y2": 778.438460152571
           },
           "poly2d": null,
           "box3d": null
@@ -1097,12 +1121,12 @@
           "id": "VYTsRByxTg0VQVCp",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1807.1671562643257,
-            "x2": 1824.737098374683,
-            "y1": 772.3378922231257,
-            "y2": 798.8832555962545
+            "x1": 1802.6703899042789,
+            "x2": 1823.7542541136856,
+            "y1": 774.5545904297855,
+            "y2": 802.2965170211103
           },
           "poly2d": null,
           "box3d": null
@@ -1111,12 +1135,12 @@
           "id": "diD094DieHCuk1wF",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1910.268365212224,
-            "x2": 1917.2292261668729,
-            "y1": 755.6095988920881,
-            "y2": 772.2358569315305
+            "x1": 1908.0897109513128,
+            "x2": 1916.9671274605366,
+            "y1": 761.7933041977763,
+            "y2": 779.5481372162241
           },
           "poly2d": null,
           "box3d": null
@@ -1166,7 +1190,7 @@
           "manualShape": true,
           "box2d": {
             "x1": 1811.1602040063449,
-            "x2": 1827.9210768795663,
+            "x2": 1829.3026394319506,
             "y1": 772.4790527158253,
             "y2": 799.0992625732947
           },
@@ -1177,12 +1201,12 @@
           "id": "diD094DieHCuk1wF",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1909.4431163778388,
+            "x1": 1906.4251953558332,
             "x2": 1916.7227343876834,
-            "y1": 755.6276957171741,
-            "y2": 772.2763895622463
+            "y1": 759.0191115386438,
+            "y2": 775.6642674934386
           },
           "poly2d": null,
           "box3d": null
@@ -1243,12 +1267,12 @@
           "id": "diD094DieHCuk1wF",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1908.6178675434535,
+            "x1": 1903.6510026967007,
             "x2": 1916.2162426084938,
             "y1": 755.64579254226,
-            "y2": 772.3169221929621
+            "y2": 772.8900748343061
           },
           "poly2d": null,
           "box3d": null
@@ -1309,9 +1333,9 @@
           "id": "diD094DieHCuk1wF",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1907.7926187090682,
+            "x1": 1904.2058412285273,
             "x2": 1915.7097508293043,
             "y1": 755.663889367346,
             "y2": 772.3574548236779
@@ -1375,9 +1399,9 @@
           "id": "diD094DieHCuk1wF",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1906.9673698746828,
+            "x1": 1905.3155182921803,
             "x2": 1915.2032590501149,
             "y1": 755.681986192432,
             "y2": 772.3979874543937
@@ -1874,7 +1898,10 @@
         {
           "id": "VYTsRByxTg0VQVCp",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1906.1375698785039,
@@ -2292,7 +2319,10 @@
         {
           "id": "HCR8XVS6TDsZkxBJ",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1445.8161479162711,
@@ -2330,7 +2360,10 @@
         {
           "id": "HCR8XVS6TDsZkxBJ",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1443.2604709715374,
@@ -2368,7 +2401,10 @@
         {
           "id": "HCR8XVS6TDsZkxBJ",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1440.7047940268035,
@@ -2392,7 +2428,10 @@
         {
           "id": "bZYK592QavaQwBDT",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1516.6780995657107,
@@ -2430,7 +2469,10 @@
         {
           "id": "bZYK592QavaQwBDT",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1511.3344114085398,
@@ -2786,7 +2828,10 @@
         {
           "id": "HCR8XVS6TDsZkxBJ",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1400.6645076872196,
@@ -2848,7 +2893,10 @@
         {
           "id": "bZYK592QavaQwBDT",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1464.7688312931007,
@@ -3918,7 +3966,10 @@
         {
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1082.0850272149792,
@@ -3984,7 +4035,10 @@
         {
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1083.323583140826,
@@ -4147,7 +4201,7 @@
           "attributes": {},
           "manualShape": true,
           "box2d": {
-            "x1": 1085.80069499252,
+            "x1": 1087.5912580171725,
             "x2": 1098.5991062262722,
             "y1": 682.0314631664043,
             "y2": 697.7198382271326
@@ -4239,12 +4293,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1086.7984205994524,
-            "x2": 1099.700044827025,
-            "y1": 682.1346761602248,
-            "y2": 698.0122750429576
+            "x1": 1089.7459707621297,
+            "x2": 1101.0582126731554,
+            "y1": 683.5826183376879,
+            "y2": 699.204285738628
           },
           "poly2d": null,
           "box3d": null
@@ -4333,12 +4387,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1087.7961462063845,
-            "x2": 1100.800983427778,
-            "y1": 682.2378891540454,
-            "y2": 698.3047118587826
+            "x1": 1092.4393616933264,
+            "x2": 1104.2902817905913,
+            "y1": 681.96658377897,
+            "y2": 696.5108948074314
           },
           "poly2d": null,
           "box3d": null
@@ -4427,12 +4481,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1088.7938718133169,
-            "x2": 1101.9019220285309,
-            "y1": 682.341102147866,
-            "y2": 698.5971486746075
+            "x1": 1093.516718065805,
+            "x2": 1106.4449945355484,
+            "y1": 679.2731928477734,
+            "y2": 694.3561820624742
           },
           "poly2d": null,
           "box3d": null
@@ -4521,12 +4575,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1089.7915974202492,
-            "x2": 1103.0028606292835,
-            "y1": 682.4443151416866,
-            "y2": 698.8895854904325
+            "x1": 1094.0553962520444,
+            "x2": 1108.0610290942664,
+            "y1": 680.350549220252,
+            "y2": 695.4335384349528
           },
           "poly2d": null,
           "box3d": null
@@ -4615,12 +4669,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1090.7893230271816,
-            "x2": 1104.1037992300364,
-            "y1": 682.5475281355072,
-            "y2": 699.1820223062575
+            "x1": 1095.671430810762,
+            "x2": 1108.5997072805058,
+            "y1": 679.2731928477734,
+            "y2": 695.9722166211922
           },
           "poly2d": null,
           "box3d": null
@@ -4709,12 +4763,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1091.7870486341137,
-            "x2": 1105.2047378307893,
-            "y1": 682.6507411293278,
-            "y2": 699.4744591220825
+            "x1": 1096.2101089970015,
+            "x2": 1109.6770636529843,
+            "y1": 683.0439401514486,
+            "y2": 699.7429639248674
           },
           "poly2d": null,
           "box3d": null
@@ -4803,12 +4857,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1092.784774241046,
-            "x2": 1106.3056764315422,
-            "y1": 682.7539541231483,
-            "y2": 699.7668959379075
+            "x1": 1095.671430810762,
+            "x2": 1110.2157418392237,
+            "y1": 681.4279055927307,
+            "y2": 698.6656075523887
           },
           "poly2d": null,
           "box3d": null
@@ -4897,12 +4951,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1093.7824998479784,
-            "x2": 1107.4066150322951,
-            "y1": 682.8571671169689,
-            "y2": 700.0593327537325
+            "x1": 1094.5940744382835,
+            "x2": 1109.6770636529843,
+            "y1": 679.8118710340127,
+            "y2": 697.58825117991
           },
           "poly2d": null,
           "box3d": null
@@ -4991,12 +5045,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1094.7802254549106,
-            "x2": 1108.507553633048,
-            "y1": 682.9603801107895,
-            "y2": 700.3517695695575
+            "x1": 1095.671430810762,
+            "x2": 1110.2157418392237,
+            "y1": 677.1184801028162,
+            "y2": 694.3561820624742
           },
           "poly2d": null,
           "box3d": null
@@ -5085,12 +5139,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1095.777951061843,
-            "x2": 1109.608492233801,
-            "y1": 683.06359310461,
-            "y2": 700.6442063853824
+            "x1": 1096.748787183241,
+            "x2": 1111.2930982117023,
+            "y1": 677.6571582890555,
+            "y2": 695.9722166211922
           },
           "poly2d": null,
           "box3d": null
@@ -5179,12 +5233,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1096.7756766687753,
-            "x2": 1110.7094308345538,
-            "y1": 683.1668060984307,
-            "y2": 700.9366432012074
+            "x1": 1097.28746536948,
+            "x2": 1112.3704545841808,
+            "y1": 679.8118710340127,
+            "y2": 698.6656075523887
           },
           "poly2d": null,
           "box3d": null
@@ -5273,10 +5327,10 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1097.7734022757077,
-            "x2": 1111.8103694353067,
+            "x1": 1099.9808563006768,
+            "x2": 1113.9864891428988,
             "y1": 683.2700190922512,
             "y2": 701.2290800170324
           },
@@ -5367,12 +5421,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1098.7711278826398,
-            "x2": 1112.9113080360594,
-            "y1": 683.3732320860718,
-            "y2": 701.5215168328574
+            "x1": 1102.135569045634,
+            "x2": 1116.6798800740953,
+            "y1": 684.1212965239272,
+            "y2": 701.8976766698246
           },
           "poly2d": null,
           "box3d": null
@@ -5461,12 +5515,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1099.7688534895722,
-            "x2": 1114.0122466368123,
-            "y1": 683.4764450798924,
-            "y2": 701.8139536486824
+            "x1": 1103.7516036043519,
+            "x2": 1118.8345928190527,
+            "y1": 681.96658377897,
+            "y2": 698.6656075523887
           },
           "poly2d": null,
           "box3d": null
@@ -5555,12 +5609,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1100.7665790965045,
-            "x2": 1115.1131852375652,
-            "y1": 683.579658073713,
-            "y2": 702.1063904645073
+            "x1": 1105.3676381630698,
+            "x2": 1122.0666619364886,
+            "y1": 679.8118710340127,
+            "y2": 697.58825117991
           },
           "poly2d": null,
           "box3d": null
@@ -5649,12 +5703,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1101.7643047034367,
-            "x2": 1116.214123838318,
-            "y1": 683.6828710675336,
-            "y2": 702.3988272803323
+            "x1": 1107.5223509080272,
+            "x2": 1122.6053401227277,
+            "y1": 679.8118710340127,
+            "y2": 698.6656075523887
           },
           "poly2d": null,
           "box3d": null
@@ -5743,12 +5797,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1102.762030310369,
-            "x2": 1117.315062439071,
-            "y1": 683.7860840613541,
-            "y2": 702.6912640961573
+            "x1": 1108.5997072805058,
+            "x2": 1123.1440183089671,
+            "y1": 679.8118710340127,
+            "y2": 699.204285738628
           },
           "poly2d": null,
           "box3d": null
@@ -5837,10 +5891,10 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1103.7597559173014,
-            "x2": 1118.4160010398239,
+            "x1": 1108.0610290942664,
+            "x2": 1122.6053401227277,
             "y1": 683.8892970551747,
             "y2": 702.9837009119823
           },
@@ -5930,13 +5984,16 @@
         {
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
-          "attributes": {},
-          "manualShape": false,
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
+          "manualShape": true,
           "box2d": {
-            "x1": 1104.7574815242335,
-            "x2": 1119.5169396405768,
+            "x1": 1106.9836727217878,
+            "x2": 1122.0666619364886,
             "y1": 683.9925100489953,
-            "y2": 703.2761377278073
+            "y2": 702.9750330423032
           },
           "poly2d": null,
           "box3d": null
@@ -6024,7 +6081,10 @@
         {
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1105.755207131166,
@@ -6119,12 +6179,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1106.7529327380983,
+            "x1": 1105.3676381630698,
             "x2": 1121.7188168420823,
-            "y1": 684.1989360366365,
-            "y2": 703.8610113594573
+            "y1": 680.350549220252,
+            "y2": 699.7429639248674
           },
           "poly2d": null,
           "box3d": null
@@ -6213,12 +6273,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1107.7506583450306,
+            "x1": 1106.4449945355484,
             "x2": 1122.8197554428352,
-            "y1": 684.302149030457,
-            "y2": 704.1534481752822
+            "y1": 678.1958364752948,
+            "y2": 699.204285738628
           },
           "poly2d": null,
           "box3d": null
@@ -6307,12 +6367,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1108.7483839519628,
+            "x1": 1108.5997072805058,
             "x2": 1123.9206940435881,
-            "y1": 684.4053620242777,
-            "y2": 704.4458849911072
+            "y1": 680.8892274064914,
+            "y2": 700.8203202973459
           },
           "poly2d": null,
           "box3d": null
@@ -6564,7 +6624,10 @@
         {
           "id": "SdoL9IflIPTdT0L7",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
           "manualShape": true,
           "box2d": {
             "x1": 0,
@@ -7069,11 +7132,11 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1115.608607607904,
+            "x1": 1114.5251673291382,
             "x2": 1132.783249779649,
-            "y1": 690.7839250423896,
+            "y1": 687.8920438276024,
             "y2": 713.0779317076352
           },
           "poly2d": null,
@@ -7149,12 +7212,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1114.865474052396,
-            "x2": 1131.8749754340279,
-            "y1": 691.2793474127284,
-            "y2": 713.9862060532563
+            "x1": 1113.4478109566596,
+            "x2": 1130.1468347300781,
+            "y1": 685.1986528964059,
+            "y2": 709.9778494634143
           },
           "poly2d": null,
           "box3d": null
@@ -7229,12 +7292,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1114.1223404968875,
-            "x2": 1130.9667010884066,
-            "y1": 691.7747697830671,
-            "y2": 714.8944803988775
+            "x1": 1112.3704545841808,
+            "x2": 1130.1468347300781,
+            "y1": 683.5826183376879,
+            "y2": 708.9004930909356
           },
           "poly2d": null,
           "box3d": null
@@ -7309,12 +7372,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1113.3792069413794,
-            "x2": 1130.0584267427855,
-            "y1": 692.2701921534059,
-            "y2": 715.8027547444985
+            "x1": 1112.9091327704202,
+            "x2": 1129.0694783575996,
+            "y1": 686.2760092688845,
+            "y2": 711.0552058358928
           },
           "poly2d": null,
           "box3d": null
@@ -7469,12 +7532,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1113.737011986624,
+            "x1": 1112.3704545841808,
             "x2": 1130.3887083230113,
-            "y1": 690.9765892975213,
-            "y2": 715.8853251395551
+            "y1": 693.2788256899955,
+            "y2": 719.1353786294826
           },
           "poly2d": null,
           "box3d": null
@@ -7549,12 +7612,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 1114.837950587377,
-            "x2": 1131.6272642488584,
+            "x2": 1132.8402256612749,
             "y1": 689.1875640712979,
-            "y2": 715.0596211889904
+            "y2": 717.5193440707646
           },
           "poly2d": null,
           "box3d": null
@@ -7632,7 +7695,7 @@
           "manualShape": true,
           "box2d": {
             "x1": 1115.93888918813,
-            "x2": 1132.8658201747053,
+            "x2": 1133.378903847514,
             "y1": 687.3985388450744,
             "y2": 714.2339172384258
           },
@@ -7789,12 +7852,12 @@
           "id": "Z7iOkq43fTRJymRY",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1115.1131852375652,
-            "x2": 1135.6181666765874,
-            "y1": 690.2885026720508,
-            "y2": 718.5688629788901
+            "x1": 1115.6025237016167,
+            "x2": 1136.61097296495,
+            "y1": 688.4307220138418,
+            "y2": 716.441987698286
           },
           "poly2d": null,
           "box3d": null
@@ -7871,10 +7934,10 @@
           "attributes": {},
           "manualShape": true,
           "box2d": {
-            "x1": 1114.700333262283,
+            "x1": 1116.1412018878561,
             "x2": 1136.9943399275285,
             "y1": 694.0041704495917,
-            "y2": 724.5552166204839
+            "y2": 721.8287695606791
           },
           "poly2d": null,
           "box3d": null
@@ -7910,7 +7973,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 735.4443518755743,
@@ -7924,7 +7990,10 @@
         {
           "id": "DPz9XmFOYWmPJMKd",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 815.265284254876,
@@ -7951,7 +8020,7 @@
           "attributes": {},
           "manualShape": true,
           "box2d": {
-            "x1": 1115.93888918813,
+            "x1": 1115.0638455153774,
             "x2": 1135.3429320263992,
             "y1": 696.894134276568,
             "y2": 725.2261010803177
@@ -7990,7 +8059,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 739.4502738185927,
@@ -8070,7 +8142,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 744.9577480207256,
@@ -8150,7 +8225,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 750.4652222228584,
@@ -8230,7 +8308,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 755.9726964249913,
@@ -8271,7 +8352,7 @@
           "attributes": {},
           "manualShape": true,
           "box2d": {
-            "x1": 1124.5055676752381,
+            "x1": 1122.6053401227277,
             "x2": 1144.8385274578927,
             "y1": 690.5981416535125,
             "y2": 721.2524008182253
@@ -8310,7 +8391,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 761.4801706271242,
@@ -8324,12 +8408,15 @@
         {
           "id": "DPz9XmFOYWmPJMKd",
           "category": "face",
-          "attributes": {},
-          "manualShape": false,
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
+          "manualShape": true,
           "box2d": {
-            "x1": 847.8902033534386,
-            "x2": 866.6054190889366,
-            "y1": 671.2526973425078,
+            "x1": 845.2700929235488,
+            "x2": 864.6948234712347,
+            "y1": 672.2134025896188,
             "y2": 692.125008593903
           },
           "poly2d": null,
@@ -8390,7 +8477,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 766.9876448292571,
@@ -8404,7 +8494,10 @@
         {
           "id": "DPz9XmFOYWmPJMKd",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 855.2769961522413,
@@ -8470,7 +8563,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 772.4951190313899,
@@ -8550,7 +8646,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 778.0025932335228,
@@ -8630,7 +8729,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 783.5100674356556,
@@ -8702,7 +8804,7 @@
             "x1": 811.9016116473393,
             "x2": 843.3824746380429,
             "y1": 703.380118321462,
-            "y2": 743.8623271190445
+            "y2": 745.6565908128676
           },
           "poly2d": null,
           "box3d": null
@@ -8710,7 +8812,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 789.0175416377886,
@@ -8790,7 +8895,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 796.6997257380842,
@@ -8870,7 +8978,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 804.3819098383799,
@@ -8937,10 +9048,10 @@
           "id": "RlNMmbxVJ97aZ25F",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 862.1121288271854,
-            "x2": 897.1832842140753,
+            "x2": 899.2618485203184,
             "y1": 710.27344799682,
             "y2": 752.5193467834785
           },
@@ -9017,11 +9128,11 @@
           "id": "RlNMmbxVJ97aZ25F",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 878.8107595975728,
             "x2": 914.9334281072053,
-            "y1": 715.7817696856307,
+            "y1": 711.3563876354757,
             "y2": 759.653098883846
           },
           "poly2d": null,
@@ -9364,7 +9475,10 @@
         {
           "id": "DPz9XmFOYWmPJMKd",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 937.9369252198833,
@@ -9444,7 +9558,10 @@
         {
           "id": "DPz9XmFOYWmPJMKd",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 946.8945743997092,
@@ -9524,7 +9641,10 @@
         {
           "id": "DPz9XmFOYWmPJMKd",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 955.8522235795352,
@@ -10682,7 +10802,10 @@
         {
           "id": "ugfjAehl5bA4Tg8v",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1878.9267004081548,
@@ -11132,7 +11255,10 @@
         {
           "id": "DPz9XmFOYWmPJMKd",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 1221.9918778695662,
@@ -11511,12 +11637,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 703.9089483308694,
-            "x2": 711.8959097884504,
-            "y1": 663.1239161136092,
-            "y2": 672.296039593928
+            "x2": 712.1696573620117,
+            "y1": 661.8017163775679,
+            "y2": 670.4716078584968
           },
           "poly2d": null,
           "box3d": null
@@ -11577,11 +11703,11 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 704.1408278570573,
-            "x2": 712.1535537064368,
-            "y1": 662.6859214530322,
+            "x2": 713.8210652631409,
+            "y1": 660.9760124270032,
             "y2": 671.9611025005455
           },
           "poly2d": null,
@@ -11643,12 +11769,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 704.372707383245,
-            "x2": 712.4111976244233,
+            "x2": 713.4082132878586,
             "y1": 662.2479267924551,
-            "y2": 671.6261654071631
+            "y2": 672.5358677349084
           },
           "poly2d": null,
           "box3d": null
@@ -11709,12 +11835,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 704.6045869094329,
-            "x2": 712.6688415424098,
+            "x2": 713.8210652631409,
             "y1": 661.8099321318781,
-            "y2": 671.2912283137807
+            "y2": 672.5358677349084
           },
           "poly2d": null,
           "box3d": null
@@ -11789,12 +11915,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 704.8364664356208,
-            "x2": 712.9264854603963,
+            "x2": 713.4082132878586,
             "y1": 661.3719374713011,
-            "y2": 670.9562912203983
+            "y2": 672.5358677349084
           },
           "poly2d": null,
           "box3d": null
@@ -11883,11 +12009,11 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 705.0683459618085,
-            "x2": 713.1841293783827,
-            "y1": 660.9339428107241,
+            "x2": 715.4724731642702,
+            "y1": 660.5631604517209,
             "y2": 670.6213541270158
           },
           "poly2d": null,
@@ -11977,12 +12103,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 705.3002254879964,
-            "x2": 713.4417732963692,
-            "y1": 660.4959481501471,
-            "y2": 670.2864170336334
+            "x2": 713.8210652631409,
+            "y1": 658.4989005753093,
+            "y2": 667.9944960068028
           },
           "poly2d": null,
           "box3d": null
@@ -12071,12 +12197,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 705.5321050141843,
-            "x2": 713.6994172143558,
-            "y1": 660.0579534895701,
-            "y2": 669.951479940251
+            "x1": 705.151173782212,
+            "x2": 713.4082132878586,
+            "y1": 656.0217887236154,
+            "y2": 665.9302361303911
           },
           "poly2d": null,
           "box3d": null
@@ -12165,12 +12291,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 705.763984540372,
-            "x2": 713.9570611323422,
-            "y1": 659.619958828993,
-            "y2": 669.6165428468686
+            "x1": 707.2154336586237,
+            "x2": 715.4724731642702,
+            "y1": 656.84749267418,
+            "y2": 668.8201999573674
           },
           "poly2d": null,
           "box3d": null
@@ -12353,12 +12479,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 706.2277435927477,
-            "x2": 714.4723489683151,
-            "y1": 658.743969507839,
-            "y2": 668.9466686601037
+            "x1": 703.0869139058004,
+            "x2": 712.9953613125763,
+            "y1": 658.9117525505916,
+            "y2": 671.2973118090614
           },
           "poly2d": null,
           "box3d": null
@@ -12437,7 +12563,7 @@
           "box2d": {
             "x1": 1487.216898383397,
             "x2": 1504.480597442815,
-            "y1": 739.5971779396573,
+            "y1": 741.9283078588034,
             "y2": 764.1725613065936
           },
           "poly2d": null,
@@ -12447,12 +12573,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 706.4596231189356,
-            "x2": 714.7299928863017,
-            "y1": 658.305974847262,
-            "y2": 668.6117315667213
+            "x1": 703.0869139058004,
+            "x2": 713.4082132878586,
+            "y1": 658.9117525505916,
+            "y2": 671.7101637843436
           },
           "poly2d": null,
           "box3d": null
@@ -12531,7 +12657,7 @@
           "box2d": {
             "x1": 1494.6639842521656,
             "x2": 1512.0969352631466,
-            "y1": 741.5266501874746,
+            "y1": 744.9109342220548,
             "y2": 766.2035847253486
           },
           "poly2d": null,
@@ -12541,12 +12667,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 706.6915026451234,
+            "x1": 703.912617856365,
             "x2": 714.9876368042882,
             "y1": 657.8679801866849,
-            "y2": 668.2767944733389
+            "y2": 671.2973118090614
           },
           "poly2d": null,
           "box3d": null
@@ -12592,7 +12718,10 @@
         {
           "id": "DPz9XmFOYWmPJMKd",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1873.67051260027,
@@ -12637,10 +12766,10 @@
           "attributes": {},
           "manualShape": true,
           "box2d": {
-            "x1": 706.9233821713112,
-            "x2": 715.2452807222746,
-            "y1": 657.4299855261079,
-            "y2": 667.9418573799564
+            "x1": 705.9768777327768,
+            "x2": 716.2981771148349,
+            "y1": 657.2603446494624,
+            "y2": 669.645903907932
           },
           "poly2d": null,
           "box3d": null
@@ -12715,12 +12844,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 709.1133554741964,
+            "x1": 707.628285633906,
             "x2": 717.8732486857368,
             "y1": 658.5249721775505,
-            "y2": 668.8178467011105
+            "y2": 670.4716078584968
           },
           "poly2d": null,
           "box3d": null
@@ -12752,7 +12881,10 @@
         {
           "id": "XH7AYxLcEDx3txGP",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1882.6754515554378,
@@ -12800,7 +12932,7 @@
             "x1": 711.3033287770814,
             "x2": 720.5012166491989,
             "y1": 659.619958828993,
-            "y2": 669.6938360222645
+            "y2": 671.2973118090614
           },
           "poly2d": null,
           "box3d": null
@@ -12861,12 +12993,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 712.9093091991972,
             "x2": 721.9611988511223,
             "y1": 658.743969507839,
-            "y2": 669.2558413616874
+            "y2": 670.4716078584968
           },
           "poly2d": null,
           "box3d": null
@@ -13196,7 +13328,7 @@
             "x1": 720.0632219886219,
             "x2": 730.1370991818934,
             "y1": 654.8020175626458,
-            "y2": 664.8758947559173
+            "y2": 667.1687920562381
           },
           "poly2d": null,
           "box3d": null
@@ -13257,12 +13389,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 721.0852095299682,
             "x2": 731.3050849434321,
             "y1": 654.8020175626458,
-            "y2": 665.4598876366866
+            "y2": 666.4911801351577
           },
           "poly2d": null,
           "box3d": null
@@ -13323,12 +13455,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 722.1071970713147,
             "x2": 732.4730707049708,
             "y1": 654.8020175626458,
-            "y2": 666.043880517456
+            "y2": 667.9700806827949
           },
           "poly2d": null,
           "box3d": null
@@ -13375,9 +13507,9 @@
           "id": "oH1L5tfMw7YI3Khh",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1580.982479549256,
+            "x1": 1577.8093461600279,
             "x2": 1599.4309422696144,
             "y1": 741.8313037002878,
             "y2": 767.0498444831633
@@ -13441,9 +13573,9 @@
           "id": "oH1L5tfMw7YI3Khh",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 1595.0303915289785,
+            "x1": 1593.468134567098,
             "x2": 1613.140350346211,
             "y1": 742.3390595549766,
             "y2": 767.8961042409778
@@ -13455,12 +13587,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 725.7571525761231,
             "x2": 736.5610208703563,
             "y1": 652.4660460395684,
-            "y2": 664.5838983155326
+            "y2": 665.1045321798265
           },
           "poly2d": null,
           "box3d": null
@@ -13653,12 +13785,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 735.8310297693946,
             "x2": 746.8903949489643,
             "y1": 648.3415963191347,
-            "y2": 661.3719374713012
+            "y2": 663.0402723034149
           },
           "poly2d": null,
           "box3d": null
@@ -13719,12 +13851,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 740.6489710357419,
             "x2": 751.3798402198788,
-            "y1": 648.8890896448561,
-            "y2": 662.2479267924552
+            "y1": 651.7021746587859,
+            "y2": 664.5193127383081
           },
           "poly2d": null,
           "box3d": null
@@ -13771,11 +13903,11 @@
           "id": "oH1L5tfMw7YI3Khh",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 1667.4702267979092,
             "x2": 1688.7959726948372,
-            "y1": 751.1401610362486,
+            "y1": 748.6392171761191,
             "y2": 776.5279537706868
           },
           "poly2d": null,
@@ -13905,9 +14037,9 @@
           "attributes": {},
           "manualShape": true,
           "box2d": {
-            "x1": 1696.9200663698575,
+            "x1": 1695.6230875084611,
             "x2": 1718.2458122667858,
-            "y1": 760.6182703237722,
+            "y1": 759.8240660383121,
             "y2": 787.021574767588
           },
           "poly2d": null,
@@ -14049,9 +14181,9 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 758.8695489157459,
+            "x1": 756.7576706925028,
             "x2": 769.8194154301714,
             "y1": 650.2468730926448,
             "y2": 664.4379000953403
@@ -14115,9 +14247,9 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 761.7311140315159,
+            "x1": 760.6478483347252,
             "x2": 772.972976986326,
             "y1": 650.3344720247602,
             "y2": 664.5838983155326
@@ -14181,12 +14313,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 764.5926791472857,
-            "x2": 776.1265385424805,
+            "x1": 760.1548814855128,
+            "x2": 773.9579532634598,
             "y1": 650.4220709568756,
-            "y2": 664.729896535725
+            "y2": 665.9982132859453
           },
           "poly2d": null,
           "box3d": null
@@ -14247,12 +14379,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 767.4542442630556,
-            "x2": 779.280100098635,
-            "y1": 650.509669888991,
-            "y2": 664.8758947559173
+            "x1": 764.0986162792119,
+            "x2": 777.4087212079465,
+            "y1": 648.2514067142992,
+            "y2": 663.5333790398834
           },
           "poly2d": null,
           "box3d": null
@@ -14313,12 +14445,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 770.3158093788254,
-            "x2": 782.4336616547896,
-            "y1": 650.5972688211064,
-            "y2": 665.0218929761096
+            "x1": 766.6661180992786,
+            "x2": 779.8735554540085,
+            "y1": 648.1776011932511,
+            "y2": 662.6274203281325
           },
           "poly2d": null,
           "box3d": null
@@ -14379,12 +14511,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 773.1773744945953,
-            "x2": 785.5872232109441,
-            "y1": 650.6848677532219,
-            "y2": 665.167891196302
+            "x1": 770.0142184697606,
+            "x2": 783.3243233984953,
+            "y1": 646.772506166662,
+            "y2": 662.0544784922462
           },
           "poly2d": null,
           "box3d": null
@@ -14445,12 +14577,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 776.0389396103651,
-            "x2": 788.7407847670987,
-            "y1": 650.7724666853372,
-            "y2": 665.3138894164942
+            "x1": 773.4649864142474,
+            "x2": 786.2821244937696,
+            "y1": 648.2514067142992,
+            "y2": 662.0544784922462
           },
           "poly2d": null,
           "box3d": null
@@ -14511,12 +14643,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 778.900504726135,
-            "x2": 791.8943463232532,
-            "y1": 650.8600656174526,
-            "y2": 665.4598876366866
+            "x1": 777.4087212079465,
+            "x2": 790.2258592874688,
+            "y1": 647.7584398650868,
+            "y2": 661.5615116430338
           },
           "poly2d": null,
           "box3d": null
@@ -14632,7 +14764,10 @@
         {
           "id": "xMBj9SQdosIMUtE1",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 513.5487395265566,
@@ -14726,7 +14861,10 @@
         {
           "id": "xMBj9SQdosIMUtE1",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 512.0157582145371,
@@ -14983,9 +15121,9 @@
           "attributes": {},
           "manualShape": true,
           "box2d": {
-            "x1": 509.387790251075,
-            "x2": 521.6516407472316,
-            "y1": 646.9181136722594,
+            "x1": 507.821862949877,
+            "x2": 522.4655417991011,
+            "y1": 644.3218693658583,
             "y2": 658.305974847262
           },
           "poly2d": null,
@@ -15033,11 +15171,11 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 794.7267117949847,
             "x2": 809.1805355940263,
-            "y1": 652.2908481753376,
+            "y1": 650.7162409603611,
             "y2": 667.357864499187
           },
           "poly2d": null,
@@ -15113,12 +15251,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 796.2450932849849,
             "x2": 810.6989170840267,
             "y1": 653.2836360726454,
-            "y2": 668.5258502607257
+            "y2": 669.4489812304321
           },
           "poly2d": null,
           "box3d": null
@@ -15193,12 +15331,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 797.7634747749853,
-            "x2": 812.2172985740269,
-            "y1": 654.2764239699534,
-            "y2": 669.6938360222645
+            "x1": 796.63442832723,
+            "x2": 811.4234338036018,
+            "y1": 657.1248100001222,
+            "y2": 672.8997491749188
           },
           "poly2d": null,
           "box3d": null
@@ -15273,12 +15411,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 799.2818562649857,
-            "x2": 813.7356800640273,
-            "y1": 655.2692118672613,
-            "y2": 670.8618217838032
+            "x1": 795.6484946288052,
+            "x2": 811.4234338036018,
+            "y1": 657.6177768493346,
+            "y2": 674.378649722556
           },
           "poly2d": null,
           "box3d": null
@@ -15353,12 +15491,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 800.800237754986,
-            "x2": 815.2540615540277,
-            "y1": 656.2619997645692,
-            "y2": 672.0298075453419
+            "x1": 796.1414614780176,
+            "x2": 811.4234338036018,
+            "y1": 656.6318431509098,
+            "y2": 671.913815476494
           },
           "poly2d": null,
           "box3d": null
@@ -15418,7 +15556,10 @@
         {
           "id": "YfxAeguOR4xQlCgR",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": false,
+            "Truncated": true
+          },
           "manualShape": true,
           "box2d": {
             "x1": 1906.1154785016295,
@@ -15433,12 +15574,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 802.3186192449863,
-            "x2": 816.772443044028,
-            "y1": 657.2547876618771,
-            "y2": 673.1977933068806
+            "x1": 800.5781631209292,
+            "x2": 815.367168597301,
+            "y1": 655.6459094524851,
+            "y2": 671.4208486272817
           },
           "poly2d": null,
           "box3d": null
@@ -15499,12 +15640,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 803.8370007349866,
-            "x2": 818.2908245340284,
-            "y1": 658.2475755591851,
-            "y2": 674.3657790684193
+            "x1": 802.117759697762,
+            "x2": 817.8812228513084,
+            "y1": 654.1837208721732,
+            "y2": 670.5534710700867
           },
           "poly2d": null,
           "box3d": null
@@ -15531,7 +15672,7 @@
           "box2d": {
             "x1": 505.44583830588175,
             "x2": 518.1476834626154,
-            "y1": 648.6700923145676,
+            "y1": 648.5057776084939,
             "y2": 661.8099321318781
           },
           "poly2d": null,
@@ -15565,11 +15706,11 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 805.355382224987,
+            "x1": 802.7240467421292,
             "x2": 819.8092060240286,
-            "y1": 659.2403634564929,
+            "y1": 656.0025820052747,
             "y2": 675.5337648299582
           },
           "poly2d": null,
@@ -15631,12 +15772,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 806.8737637149874,
             "x2": 821.327587514029,
             "y1": 660.2331513538008,
-            "y2": 676.7017505914969
+            "y2": 679.0414896912271
           },
           "poly2d": null,
           "box3d": null
@@ -15697,10 +15838,10 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 808.3921452049876,
-            "x2": 822.8459690040294,
+            "x2": 823.2268387129571,
             "y1": 661.2259392511088,
             "y2": 677.8697363530356
           },
@@ -15763,11 +15904,11 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 809.910526694988,
-            "x2": 824.3643504940297,
-            "y1": 662.2187271484166,
+            "x2": 826.9755285168159,
+            "y1": 660.2465913158449,
             "y2": 679.0377221145743
           },
           "poly2d": null,
@@ -15829,11 +15970,11 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 811.4289081849884,
-            "x2": 825.8827319840301,
-            "y1": 663.2115150457246,
+            "x2": 828.7943896499173,
+            "y1": 660.8528783602121,
             "y2": 680.205707876113
           },
           "poly2d": null,
@@ -15856,7 +15997,10 @@
         {
           "id": "xMBj9SQdosIMUtE1",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 491.86800382799413,
@@ -15895,12 +16039,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 812.9472896749887,
-            "x2": 827.4011134740304,
-            "y1": 664.2043029430325,
-            "y2": 681.3736936376517
+            "x1": 814.8497876294725,
+            "x2": 830.6132507830189,
+            "y1": 659.6403042714777,
+            "y2": 678.4352026468599
           },
           "poly2d": null,
           "box3d": null
@@ -15961,11 +16105,11 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 814.465671164989,
-            "x2": 828.9194949640307,
-            "y1": 665.1970908403404,
+            "x2": 829.9157855747217,
+            "y1": 662.0654524489464,
             "y2": 682.5416793991905
           },
           "poly2d": null,
@@ -16029,10 +16173,10 @@
           "attributes": {},
           "manualShape": true,
           "box2d": {
-            "x1": 815.9840526549893,
+            "x1": 814.2569971676514,
             "x2": 830.4378764540311,
             "y1": 666.1898787376483,
-            "y2": 683.7096651607292
+            "y2": 685.2584069570254
           },
           "poly2d": null,
           "box3d": null
@@ -16093,12 +16237,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 815.5460579944123,
+            "x1": 813.5113405768386,
             "x2": 830.3582410611989,
             "y1": 666.2296964340644,
-            "y2": 683.9883890356418
+            "y2": 688.2410333202769
           },
           "poly2d": null,
           "box3d": null
@@ -16159,12 +16303,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 815.1080633338353,
-            "x2": 830.2786056683667,
-            "y1": 666.2695141304805,
-            "y2": 684.2671129105545
+            "x1": 811.2743708044001,
+            "x2": 827.6788158022831,
+            "y1": 667.3626487775166,
+            "y2": 687.4953767294639
           },
           "poly2d": null,
           "box3d": null
@@ -16200,7 +16344,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 529.0975499770409,
@@ -16225,12 +16372,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 814.6700686732584,
-            "x2": 830.1989702755345,
-            "y1": 666.3093318268966,
-            "y2": 684.5458367854671
+            "x1": 811.2743708044001,
+            "x2": 827.6788158022831,
+            "y1": 668.8539619591423,
+            "y2": 687.4953767294639
           },
           "poly2d": null,
           "box3d": null
@@ -16266,7 +16413,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 524.2796087106937,
@@ -16291,12 +16441,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 814.2320740126813,
-            "x2": 830.1193348827023,
-            "y1": 666.3491495233127,
-            "y2": 684.8245606603798
+            "x1": 809.7830576227743,
+            "x2": 826.1875026206574,
+            "y1": 665.1256790050779,
+            "y2": 684.5127503662125
           },
           "poly2d": null,
           "box3d": null
@@ -16332,7 +16482,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 519.4616674443464,
@@ -16357,12 +16510,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 813.7940793521043,
-            "x2": 830.0396994898701,
-            "y1": 666.3889672197288,
-            "y2": 685.1032845352925
+            "x1": 809.5862449499584,
+            "x2": 827.6788158022831,
+            "y1": 666.2873876396944,
+            "y2": 685.2584069570254
           },
           "poly2d": null,
           "box3d": null
@@ -16398,7 +16551,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 514.6437261779993,
@@ -16423,12 +16579,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 813.3560846915273,
+            "x1": 809.7830576227743,
             "x2": 829.960064097038,
             "y1": 666.4287849161449,
-            "y2": 685.382008410205
+            "y2": 687.4953767294639
           },
           "poly2d": null,
           "box3d": null
@@ -16464,7 +16620,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 509.82578491165197,
@@ -16489,12 +16648,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 812.9180900309502,
+            "x1": 809.7830576227743,
             "x2": 829.8804287042058,
             "y1": 666.468602612561,
-            "y2": 685.6607322851177
+            "y2": 690.4780030927154
           },
           "poly2d": null,
           "box3d": null
@@ -16530,7 +16689,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 505.0078436453048,
@@ -16555,12 +16717,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
-            "x1": 812.4800953703732,
+            "x1": 812.0200273952129,
             "x2": 829.8007933113736,
             "y1": 666.5084203089771,
-            "y2": 685.9394561600303
+            "y2": 690.4780030927154
           },
           "poly2d": null,
           "box3d": null
@@ -16596,7 +16758,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": true,
           "box2d": {
             "x1": 500.1899023789575,
@@ -16621,12 +16786,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 812.0421007097963,
-            "x2": 829.7211579185414,
+            "x2": 830.6614421655346,
             "y1": 666.5482380053932,
-            "y2": 686.218180034943
+            "y2": 690.4780030927154
           },
           "poly2d": null,
           "box3d": null
@@ -16662,7 +16827,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 496.977941534726,
@@ -16687,12 +16855,12 @@
           "id": "3py0isP9DPj8fVss",
           "category": "face",
           "attributes": {},
-          "manualShape": false,
+          "manualShape": true,
           "box2d": {
             "x1": 811.6041060492192,
             "x2": 829.6415225257092,
             "y1": 666.5880557018093,
-            "y2": 686.4969039098556
+            "y2": 688.9866899110897
           },
           "poly2d": null,
           "box3d": null
@@ -16728,7 +16896,10 @@
         {
           "id": "RXIsoDcIVqhTllPz",
           "category": "face",
-          "attributes": {},
+          "attributes": {
+            "Occluded": true,
+            "Truncated": false
+          },
           "manualShape": false,
           "box2d": {
             "x1": 493.7659806904946,
@@ -16758,7 +16929,7 @@
             "x1": 811.1661113886422,
             "x2": 829.561887132877,
             "y1": 666.6278733982253,
-            "y2": 686.7756277847683
+            "y2": 687.4953767294639
           },
           "poly2d": null,
           "box3d": null
@@ -16810,7 +16981,18 @@
     }
   ],
   "config": {
-    "attributes": [],
+    "attributes": [
+      {
+        "name": "Occluded",
+        "type": "switch",
+        "tag": "o"
+      },
+      {
+        "name": "Truncated",
+        "type": "switch",
+        "tag": "t"
+      }
+    ],
     "categories": [
       {
         "name": "face"
