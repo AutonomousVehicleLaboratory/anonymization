@@ -65,3 +65,6 @@ _C.TRACKER.IOU_THRES = 0.3
 _C.TRACKER.DISTANCE_THRESHOLD = 100
 
 _C.TRACKER.SIZE_DIST_RATIO = 0.3
+
+# Save the result of tracking to a json file for evaluation.
+_C.SAVE_TRACKING = True

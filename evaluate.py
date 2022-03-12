@@ -207,14 +207,14 @@ def filter_small_objects(
         # detections[name] = new_dets
 
         # Filter OpenPifPaf detection
-        # dets = det_pifpaf_head[name]
-        # new_dets = []
-        # for det in dets:
-        #     box = det['xyxyconf']
-        #     max_dim = max((box[2] - box[0]), (box[3] - box[1]))
-        #     if max_dim > threshold_max_dim:
-        #         new_dets.append(det)
-        # det_pifpaf_head[name] = new_dets        
+        dets = det_pifpaf_head[name]
+        new_dets = []
+        for det in dets:
+            box = det['xyxyconf']
+            max_dim = max((box[2] - box[0]), (box[3] - box[1]))
+            if max_dim > threshold_max_dim:
+                new_dets.append(det)
+        det_pifpaf_head[name] = new_dets        
 
         if viz:
             image_path = os.path.join(image_dir, name)
@@ -325,9 +325,9 @@ def evaluate_two_labels(
 
         if verbose:
             print(
-                'tp:', tp_count, 
-                'fp:', fp_count, 
-                'fn:', fn_count,
+                # 'tp:', tp_count, 
+                # 'fp:', fp_count, 
+                # 'fn:', fn_count,
                 'afh_mfh', afh_mfh_count,
                 'afh_mf', afh_mf_count,
                 'afh_mh', afh_mh_count,
@@ -351,9 +351,9 @@ def evaluate_two_labels(
     
     print('thres_face:', threshold_face,
           'thres_head:', threshold_head,
-          'tp:', tp_count, 
-          'fp:', fp_count, 
-          'fn:', fn_count,
+        #   'tp:', tp_count, 
+        #   'fp:', fp_count, 
+        #   'fn:', fn_count,
           'afh_mfh', afh_mfh_count,
           'afh_mf', afh_mf_count,
           'afh_mh', afh_mh_count,
@@ -390,14 +390,20 @@ if __name__ == '__main__':
     image_dir = cfg.IMAGE
 
     detection_path = os.path.join(save_dir, 'detection.json')
-    pifpaf_head_path = os.path.join(save_dir, 'pifpaf_pred_head.json')
+    pifpaf_head_path = os.path.join(save_dir, 'pifpaf_pred_head_0310.json')
     label_face_path = os.path.join(save_dir, 'label_face.json')
     label_head_path = os.path.join(save_dir, 'label_head.json')
+    tracking_yolo_face_path = os.path.join(save_dir, 'tracking_yolo_face.json')
+    tracking_pifpaf_head_path = os.path.join(save_dir, 'tracking_pifpaf_head.json')
 
     with open(detection_path) as fp:
         detections = json.load(fp)
     with open(pifpaf_head_path) as fp:
         det_pifpaf_head = json.load(fp)
+    with open(tracking_pifpaf_head_path) as fp:
+        tracking_pifpaf_head = json.load(fp)
+    with open(tracking_yolo_face_path) as fp:
+        tracking_yolo_face = json.load(fp)
     label_dict = defaultdict(list)
     with open(label_face_path) as fp:
         label_face = json.load(fp)
@@ -418,14 +424,17 @@ if __name__ == '__main__':
         threshold_max_dim=20,
         viz=False)
 
+    viz = False
+    verbose = False
+
     evaluate_two_labels(
         detections,
         label_dict,
         threshold_face=0.5,
         threshold_head=0.5,
         image_dir=image_dir,
-        viz=False,
-        verbose=False
+        viz=viz,
+        verbose=verbose
     )
     evaluate_two_labels(
         det_pifpaf_head,
@@ -433,10 +442,28 @@ if __name__ == '__main__':
         threshold_face=0.5,
         threshold_head=0.5,
         image_dir=image_dir,
-        viz=False,
-        verbose=False
+        viz=True,
+        verbose=True
     )
 
+    evaluate_two_labels(
+        tracking_yolo_face,
+        label_dict,
+        threshold_face=0.5,
+        threshold_head=0.5,
+        image_dir=image_dir,
+        viz=viz,
+        verbose=verbose
+    )
+    evaluate_two_labels(
+        tracking_pifpaf_head,
+        label_dict,
+        threshold_face=0.5,
+        threshold_head=0.5,
+        image_dir=image_dir,
+        viz=viz,
+        verbose=verbose
+    )
     # evaluate_detection(
     #     detections, 
     #     label_dict, 

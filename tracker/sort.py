@@ -205,9 +205,10 @@ class KalmanBoxTracker(object):
     self.id = KalmanBoxTracker.count
     KalmanBoxTracker.count += 1
     self.history = []
-    self.hits = 0
-    self.hit_streak = 0
+    self.hits = 1
+    self.hit_streak = 1
     self.age = 0
+    self.conf = bbox[4]
 
   def update(self,bbox):
     """
@@ -215,6 +216,7 @@ class KalmanBoxTracker(object):
     """
     self.time_since_update = 0
     self.history = []
+    self.conf = ((self.conf * self.hits) + bbox[4]) / (self.hits + 1)
     self.hits += 1
     self.hit_streak += 1
     self.kf.update(convert_bbox_to_z(bbox))
@@ -415,10 +417,10 @@ class Sort(object):
         if (trk.time_since_update <= self.max_age) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
           # ret.append(np.concatenate((d,[trk.id+1])).reshape(1,-1)) # +1 as MOT benchmark requires positive
           if(trk.time_since_update<1):
-            ret.append(np.concatenate((d,[trk.id+1,0, trk.hit_streak, trk.hits])).reshape(1,-1)) # +1 as MOT benchmark requires positive
+            ret.append(np.concatenate((d,[trk.id+1,0, trk.hit_streak, trk.hits, trk.conf])).reshape(1,-1)) # +1 as MOT benchmark requires positive
           else:
             # print("self filled at frame %d"%self.frame_count)
-            ret.append(np.concatenate((d,[trk.id+1, self.frame_count, trk.hit_streak, trk.hits])).reshape(1,-1))
+            ret.append(np.concatenate((d,[trk.id+1, self.frame_count, trk.hit_streak, trk.hits, trk.conf])).reshape(1,-1))
         i -= 1
         # remove dead tracklet
         if(trk.time_since_update > self.max_age):
