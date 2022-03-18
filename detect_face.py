@@ -22,6 +22,7 @@ from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 from tracker.sort import Sort
 from config.base_config_detect_face import get_cfg_defaults
+from draw_pifpaf import draw_skeleton
 
 
 def load_model(weights, device):
@@ -60,7 +61,7 @@ def show_tracking(img, xyxyconfs, colors):
     tl = 1 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
     for xyxyconf in xyxyconfs:
         x1, y1, x2, y2 = int(xyxyconf[0]), int(xyxyconf[1]), int(xyxyconf[2]), int(xyxyconf[3])
-        trk_id, hit_streak, hits = int(xyxyconf[4]), int(xyxyconf[6]), int(xyxyconf[7])
+        trk_id, hit_streak, hits, conf = int(xyxyconf[4]), int(xyxyconf[6]), int(xyxyconf[7]), float(xyxyconf[8])
         
         cv2.rectangle(img, (x1,y1), (x2, y2), colors[trk_id%32], thickness=3, lineType=cv2.LINE_AA)
         track_str = "ID" + str(trk_id) + " HS" + str(hit_streak) + " H" + str(hits)
@@ -89,7 +90,6 @@ def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
     label = str(conf)[:5]
     cv2.putText(img, label, (x1, y1 - 2), 0, tl / 2, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
     return img
-
 
 def view_tracking_with_history(img_list, display_crop = False):
     img_id = len(img_list) -1
@@ -491,7 +491,7 @@ def detect_and_save(cfg, model, image_dir, device, save_dir, show_landmark = Fal
         detection_dict = {}    
     
     if write_video:
-        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_both.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
+        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_pifpaf_face.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
     if display_results:
         cv2.namedWindow("Tracking", cv2.WND_PROP_FULLSCREEN)
 
@@ -536,9 +536,6 @@ def detect_and_save(cfg, model, image_dir, device, save_dir, show_landmark = Fal
 
         # Apply NMS
         pred = non_max_suppression_face(pred, conf_thres, iou_thres)
-
-        # print('img.shape: ', img.shape)
-        # print('orgimg.shape: ', orgimg.shape)
 
         # Process detections
         dets = []
@@ -593,89 +590,120 @@ def detect_and_save(cfg, model, image_dir, device, save_dir, show_landmark = Fal
     print("Total inference time: ", T_1 - T_0)
 
 
+def format_tracking_result(tracking_res):
+    tracker_list = []
+    for track in tracking_res:
+        track_dict = {}
+        track_dict["id"] = int(track[4])
+        track_dict["xyxyconf"] = [
+            int(track[0]), int(track[1]), int(track[2]), int(track[3]),
+            float(track[8])
+        ]
+        tracker_list.append(track_dict)
+    return tracker_list
+
+
 def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_path = None):
     write_video = cfg.WRITE_VIDEO
     display_results = cfg.DISPLAY_RESULTS
-    
-    # Load model
-    img_size = cfg.IMAGE_SIZE
-    conf_thres = cfg.CONF_THRES
-    iou_thres = cfg.IOU_THRES
+    save_tracking = cfg.SAVE_TRACKING
 
     image_paths = sorted(os.listdir(image_dir))
-
 
     T_0 = time.time()
     if not os.path.isdir(save_dir):
         os.mkdir(save_dir)
 
     detection_path = os.path.join(save_dir, 'detection.json')
-
+    pifpaf_path = os.path.join(save_dir, 'detection_pifpaf.json')
+    pred_head_path = os.path.join(save_dir, 'pifpaf_pred_head.json')
+    
     if os.path.exists(detection_path):
         print("Loading detection result file")
         with open(detection_path) as fp:
             detection_dict = json.load(fp)
+        with open(pifpaf_path) as fpif:
+            pifpaf_dict = json.load(fpif)
+        with open(pred_head_path) as fpred:
+            pred_head_dict = json.load(fpred)
     else:
-        detection_dict = {}    
+        detection_dict = {}
+        pifpaf_dict = {}
     
     if write_video:
-        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_both.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
+        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_pifpaf_only.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
     if display_results:
         cv2.namedWindow("Tracking", cv2.WND_PROP_FULLSCREEN)
+    if save_tracking:
+        tracking_result_dict = {}
 
     # Load Tracker
     tracker = Sort(max_age = cfg.TRACKER.MAX_AGE, 
                    min_hits = cfg.TRACKER.MIN_HITS, 
                    iou_threshold = cfg.TRACKER.IOU_THRES,
-                   distance_threshold = cfg.TRACKER.DISTANCE_THRESHOLD)
-    # colors = [(0,0,255)]
+                   distance_threshold = cfg.TRACKER.DISTANCE_THRESHOLD,
+                   ratio = cfg.TRACKER.SIZE_DIST_RATIO)
     colors = []
     
     for i in range(32):
         colors.append((0,0,255))
-        # colors.append((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
-    
+
     img_list = []
     for image_path in image_paths:
-        orgimg = cv2.imread(image_dir+image_path)  # BGR
-        img0 = copy.deepcopy(orgimg)
-        assert orgimg is not None, 'Image Not Found ' + image_path
+        if write_video or display_results:
+            orgimg = cv2.imread(os.path.join(image_dir, image_path))  # BGR
+            assert orgimg is not None, 'Image Not Found ' + image_path
         
         if image_path in detection_dict:
             print('use saved detection')
             dets = []
             image_det = detection_dict[image_path]
-            for det_dict in image_det:
-                xywh = det_dict['xywh']
-                conf = det_dict['conf']
-                landmarks = det_dict['landmarks']
-                class_num = det_dict['class_num']
-                xyxyconf = det_dict['xyxyconf']
-                dets.append(xyxyconf)
-                orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
+            pifpaf_det = pifpaf_dict[image_path]
+            pif_paf_pred = pred_head_dict[image_path]
+            
+            if (cfg.DISPLAY_PIFPAF):
+                # for pp_dict in pifpaf_det:
+                #     pp_kps = np.asarray(pp_dict['keypoints'])
+                #     orgimg = draw_skeleton(orgimg, pp_kps, cfg.PREDICT_PIFPAF_HEAD)
+                for pred_dict in pif_paf_pred:
+                    xyxyconf = pred_dict['xyxyconf']
+                    dets.append(xyxyconf)
+            else:
+                for det_dict in image_det:
+                    xywh = det_dict['xywh']
+                    conf = det_dict['conf']
+                    landmarks = det_dict['landmarks']
+                    class_num = det_dict['class_num']
+                    xyxyconf = det_dict['xyxyconf']
+                    dets.append(xyxyconf)
+                    # orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
         else:
             print("missing prediction for image", image_path)
-
+            exit(0)
 
         # update tracker
         tracking_res = tracker.update(dets)
-        orgimg = show_tracking(orgimg, tracking_res, colors)
+        # orgimg = show_tracking(orgimg, tracking_res, colors)
         print(image_path+" done")
-        img_list.append(orgimg)
 
-        # cv2.imwrite(save_dir + image_path, orgimg)
         if write_video:
             out.write(orgimg)
         if display_results:
+            img_list.append(orgimg)
             view_tracking_with_history(img_list, display_crop=cfg.DISPLAY_CROP)
+        if save_tracking:
+            tracking_result_dict[image_path] = format_tracking_result(tracking_res)
+
 
         # t1 = time_synchronized()
         # print("Time: ", t1-t0)
     if write_video:
         out.release()
-    if not os.path.exists(detection_path):
-        with open(detection_path, 'w') as fp:
-            json.dump(detection_dict, fp)
+    if save_tracking:
+        tracking_path = os.path.join(save_dir, 'tracking_result.json')
+        if not os.path.exists(tracking_path):
+            with open(tracking_path, 'w') as fp:
+                json.dump(tracking_result_dict, fp)
     T_1 = time_synchronized()
     print("Total inference time: ", T_1 - T_0)
 
