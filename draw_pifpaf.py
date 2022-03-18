@@ -4,7 +4,6 @@ import time
 from pathlib import Path
 import os
 import sys
-
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
@@ -12,6 +11,8 @@ import numpy as np
 from numpy import random
 import json
 import copy
+
+from config.base_config_detect_face import get_cfg_defaults
 
 
 general_keyareas = {}
@@ -22,6 +23,8 @@ general_keyareas["knee"] = [13,14]
 general_keyareas['ankle'] = [15,16]
 general_keyareas['eye'] = [2,3]
 general_keyareas['torso'] = [5,6,11,12]
+general_keyareas['right_body'] = [2, 4,6,8,10,12,14,16]
+general_keyareas['left_body'] = [1,3,5,7,9,11,13,15]
 
 KINEMATIC_TREE_SKELETON = [
     (1, 2), (2, 4),  # left head
@@ -34,38 +37,53 @@ KINEMATIC_TREE_SKELETON = [
     (7, 13), (13, 15), (15, 17),
 ]
 COCO_KEYPOINTS = [
-    'nose',            # 1
-    'left_eye',        # 2
-    'right_eye',       # 3
-    'left_ear',        # 4
-    'right_ear',       # 5
-    'left_shoulder',   # 6
-    'right_shoulder',  # 7
-    'left_elbow',      # 8
-    'right_elbow',     # 9
-    'left_wrist',      # 10
-    'right_wrist',     # 11
-    'left_hip',        # 12
-    'right_hip',       # 13
-    'left_knee',       # 14
-    'right_knee',      # 15
-    'left_ankle',      # 16
-    'right_ankle',     # 17
+    'nose',            # 0
+    'left_eye',        # 1
+    'right_eye',       # 2
+    'left_ear',        # 3
+    'right_ear',       # 4
+    'left_shoulder',   # 5
+    'right_shoulder',  # 6
+    'left_elbow',      # 7
+    'right_elbow',     # 8
+    'left_wrist',      # 9
+    'right_wrist',     # 10
+    'left_hip',        # 11
+    'right_hip',       # 12
+    'left_knee',       # 13
+    'right_knee',      # 14
+    'left_ankle',      # 15
+    'right_ankle',     # 16
 ]
 
-def draw_skeleton(img, pifpaf_keypoints, predict_head):
+def draw_skeleton(img, pifpaf_keypoints, predict_head, pifpaf_bbox):
     # openpifpaf keypoints format: (x, y, confidence)
     pp_kps = pifpaf_keypoints.reshape(-1,3)
     # draw skeleton by connecting different keypoint by coco default
     for pair in KINEMATIC_TREE_SKELETON:
         partA = pair[0] -1
         partB = pair[1] -1
+        # left
+        color = (0, 255, 255)
+        # right
+        if partA % 2 ==0 and partB%2==0:
+            color = (255,0,255)
         # if confidence is not zero, the keypoint exist, otherwise the keypoint would be at (0,0)
         if  not np.isclose(pp_kps[partA, 2],  0) and not np.isclose(pp_kps[partB, 2],  0):
-            cv2.line(img, pp_kps[partA,:2].astype(int), pp_kps[partB,:2].astype(int), (0, 255, 255), 2)
+            cv2.line(img, pp_kps[partA,:2].astype(int), pp_kps[partB,:2].astype(int), color, 2)
     if predict_head:
-        img = generate_head_bbox(img, pp_kps)
+        box, box_from_face, conf = generate_head_bbox(pp_kps, pifpaf_bbox)
+        if box is not None:
+            color = (0, 0, 255) if box_from_face else (255, 255, 0)
+            cv2.rectangle(img, box[0], box[1], color, 2)
     return img
+
+def face_to_us(pp_kps):
+    left_x = get_joint_coor("left_body", pp_kps)[0]
+    right_x = get_joint_coor("right_body", pp_kps)[0]
+    if left_x < right_x:
+        return False
+    return True
 
 def get_body_bbox(pp_kps):
     min_x, min_y, max_x, max_y = 1000, 1000, 0, 0
@@ -137,48 +155,64 @@ def get_human_height(pp_kps):
     return height
 
 
-
-def generate_head_bbox(img, pp_kps):
-    torso_length_head_width_ratio = 1/2
+def generate_head_bbox(pp_kps, pp_bboxes):
+    torso_length_head_width_ratio = 2/5
+    neck_to_head_height_ratio = 1/4
     head_aspect_ratio = 1.2
-    if joint_exist("face", pp_kps)  and joint_exist("shoulder", pp_kps):
-        head_width = 0
-        # max_shoulder_x, min_shoulder_x = np.amin(pp_kps[5:7, 0]).astype(int), np.amax(pp_kps[5:7, 0]).astype(int)
-        # head_bbox_x1, head_bbox_x2 = int((1 - head_shoulder_ratio) * min_shoulder_x + head_shoulder_ratio * max_shoulder_x), int(head_shoulder_ratio * min_shoulder_x + (1 - head_shoulder_ratio) * max_shoulder_x)
-        head_middle_coor = get_joint_coor('face', pp_kps)[:2]
-        
-        if joint_exist("hip", pp_kps):
-            head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
+    if face_to_us(pp_kps):
+        if joint_exist("face", pp_kps)  and joint_exist("shoulder", pp_kps):
+            head_width = 0
+            # max_shoulder_x, min_shoulder_x = np.amin(pp_kps[5:7, 0]).astype(int), np.amax(pp_kps[5:7, 0]).astype(int)
+            # head_bbox_x1, head_bbox_x2 = int((1 - head_shoulder_ratio) * min_shoulder_x + head_shoulder_ratio * max_shoulder_x), int(head_shoulder_ratio * min_shoulder_x + (1 - head_shoulder_ratio) * max_shoulder_x)
+            head_middle_coor = get_joint_coor('face', pp_kps)[:2]
+            conf = 0
+            if joint_exist("hip", pp_kps):
+                head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
+                conf = (get_joint_coor("hip",pp_kps)[2] + get_joint_coor("shoulder",pp_kps)[2]) /2
+            elif joint_exist("shoulder", pp_kps, all_exist=True):
+                head_width = (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
+                conf = np.mean(pp_kps[5:7,2])
+            else:
+                head_width = get_joint_coor("shoulder", pp_kps)[1] - get_joint_coor("face", pp_kps)[1]
+                conf = (get_joint_coor("shoulder", pp_kps)[2] + get_joint_coor("face", pp_kps)[2])/2
+            head_bbox_x1, head_bbox_x2 = int(head_middle_coor[0] - head_width/2), int(head_middle_coor[0] + head_width/2)
+            head_bbox_y1, head_bbox_y2 = int(head_middle_coor[1] - head_width * head_aspect_ratio/2), int(head_middle_coor[1] + head_width * head_aspect_ratio/2)
+            # print("xyxy: ", head_bbox_x1, head_bbox_y1, head_bbox_x2, head_bbox_y2)
+            # print((head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2) )
+            box = ((head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2))
+            box_from_face = True
         elif joint_exist("shoulder", pp_kps, all_exist=True):
-            head_width = (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
+            # 
+            head_middle_x, head_width  = get_joint_coor("shoulder", pp_kps)[0], (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
+            head_height = head_width * head_aspect_ratio
+            conf = get_joint_coor("shoulder", pp_kps)[2]
+            if joint_exist("hip", pp_kps):
+                head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
+                conf = (get_joint_coor("hip",pp_kps)[2] + get_joint_coor("shoulder",pp_kps)[2]) /2
+            pred_head_bbox_x1, pred_head_bbox_x2 = int(head_middle_x - head_width/2), int(head_middle_x + head_width/2)
+            # human height is around 6~8 head high, take average 7
+            # pred_head_bbox_y1 = int(get_joint_coor("shoulder", pp_kps)[1] - (pred_head_bbox_x2 - pred_head_bbox_x1))
+            pred_human_height = get_human_height(pp_kps)
+            if pred_human_height!=0:
+                head_height = pred_human_height / 5.5
+            pred_head_bbox_y2 = int(get_joint_coor("shoulder", pp_kps)[1] +- head_height * neck_to_head_height_ratio) 
+            pred_head_bbox_y1 = int(pred_head_bbox_y2 - head_height)
+            # print("predicted xyxy: ",pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2)
+            box = ((pred_head_bbox_x1, pred_head_bbox_y1), (pred_head_bbox_x2, pred_head_bbox_y2))
+            box_from_face = False
+        
         else:
-            head_width = get_joint_coor("shoulder", pp_kps)[1] - get_joint_coor("face", pp_kps)[1]
-        head_bbox_x1, head_bbox_x2 = int(head_middle_coor[0] - head_width/2), int(head_middle_coor[0] + head_width/2)
-        head_bbox_y1, head_bbox_y2 = int(head_middle_coor[1] - head_width * head_aspect_ratio/2), int(head_middle_coor[1] + head_width * head_aspect_ratio/2)
-        # print("xyxy: ", head_bbox_x1, head_bbox_y1, head_bbox_x2, head_bbox_y2)
-        # print((head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2) )
-        cv2.rectangle(img, (head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2), (0, 0, 255), 2)
-    elif joint_exist("shoulder", pp_kps, all_exist=True):
-        # 
-        head_middle_x, head_width  = get_joint_coor("shoulder", pp_kps)[0], (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
-        head_height = head_width * head_aspect_ratio
-        if joint_exist("hip", pp_kps):
-            head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
-        pred_head_bbox_x1, pred_head_bbox_x2 = int(head_middle_x - head_width/2), int(head_middle_x + head_width/2)
-        # human height is around 6~8 head high, take average 7
-        # pred_head_bbox_y1 = int(get_joint_coor("shoulder", pp_kps)[1] - (pred_head_bbox_x2 - pred_head_bbox_x1))
-        pred_human_height = get_human_height(pp_kps)
-        if pred_human_height!=0:
-            head_height = pred_human_height / 5.5
-        pred_head_bbox_y2 = int(get_joint_coor("shoulder", pp_kps)[1])
-        pred_head_bbox_y1 = int(pred_head_bbox_y2 - head_height)
-        # print("predicted xyxy: ",pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2)
-        cv2.rectangle(img, (pred_head_bbox_x1, pred_head_bbox_y1), (pred_head_bbox_x2, pred_head_bbox_y2), (255, 0, 0), 2)
-    # else, get body left most and right most
-    return img
+            box = None
+            box_from_face = None
+            conf = None
+    else:
+        box = None
+        box_from_face = None
+        conf = None
+        # else, get body left most and right most
+    return box, box_from_face, conf
 
-def predict_and_save():
-    save_dir = '/Users/morris/Desktop/anonymization/output_dir/avt_cameras_camera6/'
+def predict_and_save(save_dir):
     pifpaf_path = os.path.join(save_dir, 'detection_pifpaf.json')
     torso_length_head_width_ratio = 1/2
     head_aspect_ratio = 1.2
@@ -190,50 +224,42 @@ def predict_and_save():
         for pp_dict in pp_dicts:
             pp_kps = np.asarray(pp_dict['keypoints'])
             pp_kps = pp_kps.reshape(-1,3)
-            if joint_exist("face", pp_kps)  and joint_exist("shoulder", pp_kps):
-                head_width = 0
-                # max_shoulder_x, min_shoulder_x = np.amin(pp_kps[5:7, 0]).astype(int), np.amax(pp_kps[5:7, 0]).astype(int)
-                # head_bbox_x1, head_bbox_x2 = int((1 - head_shoulder_ratio) * min_shoulder_x + head_shoulder_ratio * max_shoulder_x), int(head_shoulder_ratio * min_shoulder_x + (1 - head_shoulder_ratio) * max_shoulder_x)
-                head_middle_coor = get_joint_coor('face', pp_kps)[:2]
-                conf = 0
-                if joint_exist("hip", pp_kps):
-                    head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
-                    conf = (get_joint_coor("hip",pp_kps)[2] + get_joint_coor("shoulder",pp_kps)[2]) /2
-                elif joint_exist("shoulder", pp_kps, all_exist=True):
-                    head_width = (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
-                    conf = np.mean(pp_kps[5:7,2])
-                else:
-                    head_width = get_joint_coor("shoulder", pp_kps)[1] - get_joint_coor("face", pp_kps)[1]
-                    conf = (get_joint_coor("shoulder", pp_kps)[2] + get_joint_coor("face", pp_kps)[2])/2
-                head_bbox_x1, head_bbox_x2 = int(head_middle_coor[0] - head_width/2), int(head_middle_coor[0] + head_width/2)
-                head_bbox_y1, head_bbox_y2 = int(head_middle_coor[1] - head_width * head_aspect_ratio/2), int(head_middle_coor[1] + head_width * head_aspect_ratio/2)
-                det_dict = {"xyxyconf": [head_bbox_x1, head_bbox_y1, head_bbox_x2, head_bbox_y2, round(conf, 4)]}
-                image_pred.append(det_dict)
-                # print("xyxy: ", head_bbox_x1, head_bbox_y1, head_bbox_x2, head_bbox_y2)
-                # print((head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2) )
-                
-            elif joint_exist("shoulder", pp_kps, all_exist=True):
-                # 
-                head_middle_x, head_width  = get_joint_coor("shoulder", pp_kps)[0], (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
-                head_height = head_width * head_aspect_ratio
-                conf = get_joint_coor("shoulder", pp_kps)[2]
-                if joint_exist("hip", pp_kps):
-                    head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
-                    conf = (get_joint_coor("hip",pp_kps)[2] + get_joint_coor("shoulder",pp_kps)[2]) /2
-                pred_head_bbox_x1, pred_head_bbox_x2 = int(head_middle_x - head_width/2), int(head_middle_x + head_width/2)
-                # human height is around 6~8 head high, take average 7
-                # pred_head_bbox_y1 = int(get_joint_coor("shoulder", pp_kps)[1] - (pred_head_bbox_x2 - pred_head_bbox_x1))
-                pred_human_height = get_human_height(pp_kps)
-                if pred_human_height!=0:
-                    head_height = pred_human_height / 5.5
-                pred_head_bbox_y2 = int(get_joint_coor("shoulder", pp_kps)[1])
-                pred_head_bbox_y1 = int(pred_head_bbox_y2 - head_height)
-                det_dict = {"xyxyconf": [pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2, round(conf, 4)]}
+            box, box_from_face, conf = generate_head_bbox(pp_kps)
+            if box is not None:
+                det_dict = {"xyxyconf": [box[0][0], box[0][1], box[1][0], box[1][1], round(conf, 4)], "box_from_face": box_from_face}
                 image_pred.append(det_dict)
         detection_dict[img_dest] = image_pred
-        # print("predicted xyxy: ",pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2)
-    with open(os.path.join(save_dir, "pifpaf_pred_head.json"), 'w') as f:
-        json.dump(detection_dict, f)
-    print("head prediction saved!")
+    output_path = os.path.join(save_dir, "pifpaf_pred_head_0310.json")
+    if os.path.exists(output_path):
+        print("A file with the same name as output file exists")
+    else:
+        with open(output_path, 'w') as f:
+            json.dump(detection_dict, f)
+        print("head prediction saved!")
+
+
+def parse_args():
+    """ Parse the command line arguments """
+    parser = argparse.ArgumentParser(description='cam_lidar_calibration')
+    parser.add_argument(
+        '--cfg',
+        dest='config_file',
+        default='',
+        metavar='FILE',
+        help='path to config file',
+        type=str,
+    )
+
+    args = parser.parse_args(sys.argv[1:])
+    return args
+
+
 if __name__ == '__main__':
-    predict_and_save()
+    cfg = get_cfg_defaults()
+    args = parse_args()
+    if args.config_file:
+        cfg.merge_from_file(args.config_file)
+
+    save_dir = cfg.SAVE_DIR
+
+    predict_and_save(save_dir)
