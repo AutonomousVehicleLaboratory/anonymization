@@ -328,6 +328,8 @@ def associate_detections_to_trackers_center(detections,trackers,distance_thresho
   """
   if(len(trackers)==0):
     return np.empty((0,2),dtype=int), np.arange(len(detections)), np.empty((0,5),dtype=int)
+  if(len(detections)==0):
+    return np.empty((0,2),dtype=int), np.empty((0,1),dtype=int), np.arange(len(trackers))
 
   # distance_matrix = compute_cost_matrix_center_size(detections, trackers, size_dist_ratio)
   distance_matrix = compute_cost_matrix_center(detections, trackers)

@@ -71,7 +71,7 @@ def show_tracking(img, xyxyconfs, colors):
 
 def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
     h,w,c = img.shape
-    tl = 1 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
+    tl = 2 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
     x1 = int(xywh[0] * w - 0.5 * xywh[2] * w)
     y1 = int(xywh[1] * h - 0.5 * xywh[3] * h)
     x2 = int(xywh[0] * w + 0.5 * xywh[2] * w)
@@ -88,7 +88,7 @@ def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
 
     tf = max(tl - 1, 1)  # font thickness
     label = str(conf)[:5]
-    cv2.putText(img, label, (x1, y1 - 2), 0, tl / 2, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+    # cv2.putText(img, label, (x1, y1 - 2), 0, tl / 2, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
     return img
 
 def view_tracking_with_history(img_list, display_crop = False):
@@ -96,11 +96,12 @@ def view_tracking_with_history(img_list, display_crop = False):
     while img_id >= 0 and img_id < len(img_list):
         img = img_list[img_id]
         if display_crop:
-            img_cropped = img[int(img.shape[0]*2/5)::]
+            # img_cropped = img[int(img.shape[0]*2/5)::]
+            img_cropped = img#[625:840, 475:740]
         else:
             img_cropped = img
-        command_text = "q:Quit, p:Previous, n:Next, others:continue tracking"
-        cv2.putText(img_cropped, command_text, (30,30), 0, 0.9, [0,255,255], 2, cv2.LINE_AA)
+        # command_text = "q:Quit, p:Previous, n:Next, others:continue tracking"
+        # cv2.putText(img_cropped, command_text, (30,30), 0, 0.9, [0,255,255], 2, cv2.LINE_AA)
         cv2.imshow("Tracking", img_cropped)
         if (cv2.waitKey(0) == ord('q')):
             exit(0)
@@ -650,6 +651,8 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
 
     img_list = []
     for image_path in image_paths:
+        if image_path not in detection_dict:
+            continue
         if write_video or display_results:
             orgimg = cv2.imread(os.path.join(image_dir, image_path))  # BGR
             assert orgimg is not None, 'Image Not Found ' + image_path
@@ -662,13 +665,14 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
             pif_paf_pred = pred_head_dict[image_path]
             
             if (cfg.DISPLAY_PIFPAF):
-                # for pp_dict in pifpaf_det:
-                #     pp_kps = np.asarray(pp_dict['keypoints'])
-                #     orgimg = draw_skeleton(orgimg, pp_kps, cfg.PREDICT_PIFPAF_HEAD)
+                for pp_dict in pifpaf_det:
+                    pp_kps = np.asarray(pp_dict['keypoints'])
+                    if display_results or write_video:
+                        orgimg = draw_skeleton(orgimg, pp_kps, cfg.PREDICT_PIFPAF_HEAD)
                 for pred_dict in pif_paf_pred:
                     xyxyconf = pred_dict['xyxyconf']
                     dets.append(xyxyconf)
-            else:
+            if (cfg.DISPLAY_YOLO5FACE):
                 for det_dict in image_det:
                     xywh = det_dict['xywh']
                     conf = det_dict['conf']
@@ -676,7 +680,8 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
                     class_num = det_dict['class_num']
                     xyxyconf = det_dict['xyxyconf']
                     dets.append(xyxyconf)
-                    # orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
+                    if display_results or write_video:
+                        orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
         else:
             print("missing prediction for image", image_path)
             exit(0)
@@ -688,7 +693,7 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
 
         if write_video:
             out.write(orgimg)
-        if display_results:
+        if display_results:# and image_path=='1635293319.560385704.jpg':
             img_list.append(orgimg)
             view_tracking_with_history(img_list, display_crop=cfg.DISPLAY_CROP)
         if save_tracking:
