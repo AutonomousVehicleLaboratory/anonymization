@@ -169,6 +169,19 @@ def draw_detections(img, detections, thickness=2):
             thickness=thickness)
 
 
+def anonymize_detections(img, detections):
+    ksize = (5,5)
+    sigmaX = cv2.BORDER_DEFAULT                   
+    for det in detections:
+        color = (0,255,0)
+        box = det['xyxyconf']
+        img[int(box[1]):int(box[3]), int(box[0]):int(box[2])] = \
+            cv2.GaussianBlur(
+                img[int(box[1]):int(box[3]), int(box[0]):int(box[2])],
+                ksize,
+                sigmaX)
+
+
 def filter_small_objects(
     label_dict, 
     detections,
@@ -357,12 +370,13 @@ def evaluate_two_labels(
                 'nh', nh_count)
         # if len(unmatched_faces) > 0:
             # print("Error: A face label doesn't come with head label")
-        if viz and name=='1635293319.560385704.jpg':
+        if viz:# and name=='1635293319.560385704.jpg':
             image_path = os.path.join(image_dir, name)
             img = cv2.imread(image_path)
             # draw_labels(img, labels[name])
-            draw_detections(img, detections[name])
-            cv2.imshow("Label", img[625:840, 475:740])
+            # draw_detections(img, detections[name])
+            anonymize_detections(img, detections[name])
+            cv2.imshow("Label", img) #[625:840, 475:740])
             cv2.waitKey(0)
             print(" ")
     
