@@ -91,6 +91,19 @@ def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
     # cv2.putText(img, label, (x1, y1 - 2), 0, tl / 2, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
     return img
 
+
+def show_results_xyxy(img, xyxy):
+    h,w,c = img.shape
+    tl = 2 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
+    x1 = int(xyxy[0])
+    y1 = int(xyxy[1])
+    x2 = int(xyxy[2])
+    y2 = int(xyxy[3])
+    cv2.rectangle(img, (x1,y1), (x2, y2), (0,255,0), thickness=tl, lineType=cv2.LINE_AA)
+
+    return img
+
+
 def view_tracking_with_history(img_list, display_crop = False):
     img_id = len(img_list) -1
     while img_id >= 0 and img_id < len(img_list):
@@ -604,6 +617,109 @@ def format_tracking_result(tracking_res):
     return tracker_list
 
 
+def fuse_by_confidence(labels_yolo, labels_pifpaf):
+    box_filtered = []
+    for box_yolo in labels_yolo:
+        in_a_box_and_low_conf = False
+        for box_pifpaf in labels_pifpaf:
+            if box_yolo[0] >= box_pifpaf[0] and \
+            box_yolo[2] <= box_pifpaf[2] and \
+            box_yolo[1] >= box_pifpaf[1] and \
+            box_yolo[3] <= box_pifpaf[3]:
+                if box_yolo[-1] < box_pifpaf[-1]:
+                    in_a_box_and_low_conf = True
+                    break
+        if not in_a_box_and_low_conf:
+            box_filtered.append(box_yolo)
+    for box_pifpaf in labels_pifpaf:
+        has_a_box_and_low_conf = False
+        for box_yolo in labels_yolo:
+            if box_yolo[0] >= box_pifpaf[0] and \
+            box_yolo[2] <= box_pifpaf[2] and \
+            box_yolo[1] >= box_pifpaf[1] and \
+            box_yolo[3] <= box_pifpaf[3]:
+                if box_yolo[-1] > box_pifpaf[-1]:
+                    has_a_box_and_low_conf = True
+                    break
+        if not has_a_box_and_low_conf:
+            box_filtered.append(box_pifpaf)
+    return box_filtered
+
+def filter_boxes(labels_yolo, labels_pifpaf, method):
+    box_filtered = []
+    if method == 'remove_face':
+        for label_yolo in labels_yolo:
+            box_yolo = label_yolo['xyxyconf']
+            in_a_box = False
+            for label_pifpaf in labels_pifpaf:
+                box_pifpaf = label_pifpaf['xyxyconf']
+                if box_yolo[0] >= box_pifpaf[0] and \
+                box_yolo[2] <= box_pifpaf[2] and \
+                box_yolo[1] >= box_pifpaf[1] and \
+                box_yolo[3] <= box_pifpaf[3]:
+                    in_a_box = True
+                    break
+            if not in_a_box:
+                box_filtered.append(label_yolo)
+    elif method == 'remove_head':
+        for label_pifpaf in labels_pifpaf:
+            box_pifpaf = label_pifpaf['xyxyconf']
+            has_a_box = False
+            for label_yolo in labels_yolo:
+                box_yolo = label_yolo['xyxyconf']
+                if box_yolo[0] >= box_pifpaf[0] and \
+                box_yolo[2] <= box_pifpaf[2] and \
+                box_yolo[1] >= box_pifpaf[1] and \
+                box_yolo[3] <= box_pifpaf[3]:
+                    has_a_box = True
+                    break
+            if not has_a_box:
+                box_filtered.append(label_pifpaf)
+    elif method == 'conf_fusion':
+        box_filtered = fuse_by_confidence(labels_yolo, labels_pifpaf)
+    else:
+        box_filtered.extend(labels_pifpaf)
+
+    return box_filtered
+
+
+
+def merge_detection(det_yolo, det_pifpaf, method='remove_face'):
+    detection_merged = []
+    if method == 'remove_face':
+        detection_merged.extend(det_pifpaf)
+        if len(det_yolo) > 0:
+            filtered_boxes = filter_boxes( det_yolo, det_pifpaf, method)
+            detection_merged.extend(filtered_boxes)
+    elif method == 'conf_fusion':
+        detection_merged = filter_boxes( det_yolo, det_pifpaf, method)
+    else:
+        detection_merged.extend(det_yolo)
+        if len(det_pifpaf) > 0:
+            filtered_boxes = filter_boxes( det_yolo, det_pifpaf, method)
+            detection_merged.extend(filtered_boxes) 
+    return detection_merged
+
+
+def anonymize_detections(img, detections):
+    
+    limit = img.shape 
+    for box in detections:
+        kx = int(max(box[2] - box[0], box[3] - box[1]) / 8) *2 + 1
+        kx = max(5, kx)
+        ksize = (kx, kx)
+        sigmaX = int(kx / 2)
+        color = (0,255,0)
+        box[0] = 0 if box[0] < 0 else box[0]
+        box[1] = 0 if box[1] < 0 else box[1]
+        box[2] = limit[1]-1 if box[2] > limit[1] else box[2]
+        box[3] = limit[0]-1 if box[3] > limit[0] else box[3]
+        img[int(box[1]):int(box[3]), int(box[0]):int(box[2])] = \
+            cv2.GaussianBlur(
+                img[int(box[1]):int(box[3]), int(box[0]):int(box[2])],
+                ksize,
+                sigmaX)
+
 def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_path = None):
     write_video = cfg.WRITE_VIDEO
     display_results = cfg.DISPLAY_RESULTS
@@ -632,7 +748,7 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
         pifpaf_dict = {}
     
     if write_video:
-        out = cv2.VideoWriter(save_dir+'output_tracking_cam6_pifpaf_only.avi',cv2.VideoWriter_fourcc(*'MJPG'), 3, (1920,1440))
+        out = cv2.VideoWriter(save_dir+'output_tracking_conf_fused_blurred_testing.avi',cv2.VideoWriter_fourcc(*'MJPG'), 10, (1920,1440))
     if display_results:
         cv2.namedWindow("Tracking", cv2.WND_PROP_FULLSCREEN)
     if save_tracking:
@@ -663,15 +779,17 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
             image_det = detection_dict[image_path]
             pifpaf_det = pifpaf_dict[image_path]
             pif_paf_pred = pred_head_dict[image_path]
+            det_pifpaf_head, det_yolo5face = [], []
             
             if (cfg.DISPLAY_PIFPAF):
                 for pp_dict in pifpaf_det:
                     pp_kps = np.asarray(pp_dict['keypoints'])
-                    if display_results or write_video:
-                        orgimg = draw_skeleton(orgimg, pp_kps, cfg.PREDICT_PIFPAF_HEAD)
+                    # if display_results or write_video:
+                    #     orgimg = draw_skeleton(orgimg, pp_kps, cfg.PREDICT_PIFPAF_HEAD)
                 for pred_dict in pif_paf_pred:
                     xyxyconf = pred_dict['xyxyconf']
                     dets.append(xyxyconf)
+                    det_pifpaf_head.append(xyxyconf)
             if (cfg.DISPLAY_YOLO5FACE):
                 for det_dict in image_det:
                     xywh = det_dict['xywh']
@@ -680,8 +798,15 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
                     class_num = det_dict['class_num']
                     xyxyconf = det_dict['xyxyconf']
                     dets.append(xyxyconf)
-                    if display_results or write_video:
-                        orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
+                    det_yolo5face.append(xyxyconf)
+                    # if display_results or write_video:
+                    #     orgimg = show_results(orgimg, xywh, conf, landmarks, class_num)
+            if (cfg.DISPLAY_PIFPAF and cfg.DISPLAY_YOLO5FACE):
+                detection_merged = merge_detection(det_yolo5face, det_pifpaf_head, method='conf_fusion')
+                if display_results or write_video:
+                    anonymize_detections(orgimg, detection_merged)
+                    for det_merged in detection_merged:
+                        orgimg = show_results_xyxy(orgimg, det_merged)
         else:
             print("missing prediction for image", image_path)
             exit(0)
