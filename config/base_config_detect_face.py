@@ -34,6 +34,7 @@ _C.TRACK_ONLY = True
 _C.WRITE_VIDEO = False
 
 _C.DISPLAY_RESULTS = True
+_C.DISPLAY_YOLO5FACE = True
 
 # openpifpaf config
 _C.DISPLAY_PIFPAF = True
