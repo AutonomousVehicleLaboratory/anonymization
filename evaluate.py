@@ -370,6 +370,7 @@ def evaluate_two_labels(
                     ah_mh_count = ah_mh_count + 1
                 else:
                     ah_mn_count = ah_mn_count + 1
+                    interested_regions.append(head_xyxy)
                 # When face doesn't exist in the label for a corresponding head,
                 # We can ignore the head detection
         
@@ -379,12 +380,15 @@ def evaluate_two_labels(
             if head_idx in head_to_face_dict:
                 fn_count = fn_count + 1
                 nfh_count = nfh_count + 1
-                head_xyxy = label_head_xyxy[head_idx]
-                interested_regions.append(head_xyxy)
+                # head_xyxy = label_head_xyxy[head_idx]
+                # interested_regions.append(head_xyxy)
             else:
                 nh_count = nh_count + 1
 
         fp_count = fp_count + len(unmatched_dets)
+        for det_idx in unmatched_dets:
+            det_xyxy = dets_xyxy[det_idx]
+            interested_regions.append(det_xyxy)
         an_count = an_count + len(unmatched_dets)
 
         if verbose:
@@ -406,12 +410,12 @@ def evaluate_two_labels(
         if viz and len(interested_regions) > 0:# and name=='1635293319.560385704.jpg':
             image_path = os.path.join(image_dir, name)
             img = cv2.imread(image_path)
-            # draw_labels(img, labels[name])
+            draw_labels(img, labels[name])
             draw_detections(img, detections[name])
-            # draw_interested_regions(img, interested_regions)
+            draw_interested_regions(img, interested_regions)
             # anonymize_detections(img, detections[name])
             cv2.imshow("Label", img) #[625:840, 475:740])
-            cv2.waitKey(10)
+            cv2.waitKey(0)
             print(" ")
     
     if viz:
@@ -770,15 +774,15 @@ if __name__ == '__main__':
     #     viz=viz,
     #     verbose=verbose
     # )
-    # evaluate_two_labels(
-    #     det_pifpaf_head,
-    #     label_dict,
-    #     threshold_face=threshold_face,
-    #     threshold_head=threshold_head,
-    #     image_dir=image_dir,
-    #     viz=True,         
-    #     verbose=verbose
-    # )
+    evaluate_two_labels(
+        det_pifpaf_head,
+        label_dict,
+        threshold_face=threshold_face,
+        threshold_head=threshold_head,
+        image_dir=image_dir,
+        viz=True,         
+        verbose=verbose
+    )
 
     # detection_merged = merge_detection(
     #     detections, 
@@ -821,19 +825,19 @@ if __name__ == '__main__':
     #     viz=viz,
     #     verbose=verbose
     # )
-    detection_merged = merge_detection(
-        detections, 
-        det_pifpaf_head,
-        method='conf_fusion')
-    evaluate_two_labels(
-        detection_merged,
-        label_dict,
-        threshold_face=threshold_face,
-        threshold_head=threshold_head,
-        image_dir=image_dir,
-        viz=True,
-        verbose=verbose
-    )
+    # detection_merged = merge_detection(
+    #     detections, 
+    #     det_pifpaf_head,
+    #     method='conf_fusion')
+    # evaluate_two_labels(
+    #     detection_merged,
+    #     label_dict,
+    #     threshold_face=threshold_face,
+    #     threshold_head=threshold_head,
+    #     image_dir=image_dir,
+    #     viz=True,
+    #     verbose=verbose
+    # )
 
     # evaluate_two_labels(
     #     tracking_yolo_face,
