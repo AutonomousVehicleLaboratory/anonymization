@@ -18,7 +18,7 @@
 - Install weights
 [face detection weight](https://drive.google.com/open?id=12O1RPth4CJR_Fk5-Izr4a466PpVxzV9R&authuser=j3liao%40ucsd.edu&usp=drive_fs)
 
-- If you want to use a different configuration other than specifed in the config/base_config_detect_face_api.py, please copy the default_api.yaml, modify it and pass it to the command line. For example, run: python detect_face_api --cfg myconfig.yaml
+- If you want to use a different configuration other than specifed in the config/base_config_detect_face_api.py, please copy the default_api.yaml, modify it and pass it to the command line. For example, run: python detect_roi_api --cfg myconfig.yaml
 
 
 ## Tracker tunning
