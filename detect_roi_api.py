@@ -180,6 +180,8 @@ if __name__ == '__main__':
 
         # Detect region of interest
         rois = fa.detect_roi(image, BGR=True)
+        
+        # Visualize
         for roi in rois:
             show_results_xyxy(image, roi)
         cv2.imshow("ROI", image)

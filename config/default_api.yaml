@@ -8,11 +8,15 @@ DISPLAY_YOLO5FACE: True
 DISPLAY_PIFPAF: True
 PREDICT_PIFPAF_HEAD: True
 DISPLAY_CROP: True
+
+# Face Detector parameters
 FACE_DETECTOR:
   WEIGHTS: './weights/face_l.pt'
   IMAGE_SIZE: 800
   CONF_THRES: 0.3
   IOU_THRES: 0.5
+
+# Tracker paraemters
 TRACKER:
   MAX_AGE: 5
   MIN_HITS: 1
