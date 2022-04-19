@@ -20,14 +20,14 @@ class Face_Anonymizer():
 
     def detect_roi(self, image, BGR=False):
         """ Given an image, return the bounding boxes """
-        from timeit import default_timer as timer
-        start1 = timer()
+        # from timeit import default_timer as timer
+        # start1 = timer()
         dets_face = self.face_detector.detect(image, BGR=BGR)
-        end1 = timer()
-        start2 = timer()
+        # end1 = timer()
+        # start2 = timer()
         dets_pose = self.pose_detector.detect(image)
-        end2 = timer()
-        print('time:', end1 - start1, end2 - start2)
+        # end2 = timer()
+        # print('time:', end1 - start1, end2 - start2)
         dets_head = self.generate_head_from_pose(dets_pose)
         dets_roi = self.fuse_detections(dets_face, dets_head, method=self.fusion_method)
         return dets_roi
