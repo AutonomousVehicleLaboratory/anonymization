@@ -1,15 +1,15 @@
 ## Structure
 ```
     # For experiments
-│   detect_roi_api.py  # major functions and fusion
+   detect_roi_api.py  # major functions and fusion
     detect_face_api.py # face detector (YOLO5Face)
     detect_pose_api.py # pose detector (OpenPifPaf)
     draw_pifpaf.py     # infer head
 
     # For paper source code
-    detect_face.py # given json of output of face detection and pose detection, fuse and track.
+    detect_face.py # given json of output of face detection and pose detection, fuse and track.    
     evaluate.py    # evaluate the detection
-│   sort.py        # tracker   
+    sort.py        # tracker   
 ```
 
 ## Guide
