@@ -1,0 +1,21 @@
+IMAGE_DIR: '/media/henry/Files/datasets/avl/clustering/2021-10-26-17-08-32/avt_cameras_camera6_image_color_compressed/'
+SAVE_DIR: '/home/henry/Documents/projects/avl/anonymization/output_dir/avt_cameras_camera6/'
+SAVE_TRACKING: False
+TRACK_ONLY: True
+WRITE_VIDEO: False
+DISPLAY_RESULTS: True
+DISPLAY_YOLO5FACE: True
+DISPLAY_PIFPAF: True
+PREDICT_PIFPAF_HEAD: True
+DISPLAY_CROP: True
+FACE_DETECTOR:
+  WEIGHTS: './weights/face_l.pt'
+  IMAGE_SIZE: 800
+  CONF_THRES: 0.3
+  IOU_THRES: 0.5
+TRACKER:
+  MAX_AGE: 5
+  MIN_HITS: 1
+  IOU_THRES: 0.3
+  DISTANCE_THRESHOLD: 100
+  SIZE_DIST_RATIO: 0.3
