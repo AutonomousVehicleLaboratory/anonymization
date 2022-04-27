@@ -12,11 +12,21 @@ from draw_pifpaf import generate_head_bbox
 
 class Face_Anonymizer():
 
-    def __init__(self, cfg):
+    def __init__(self, cfg=None):
+        cfg = self.get_default_cfg(cfg)
         self.face_detector = Face_Detector(cfg.FACE_DETECTOR)
         self.pose_detector = Pose_Detector(cfg.POSE_DETECTOR)
         self.fusion_method = 'conf_fusion'
 
+
+    def get_default_cfg(self, cfg):
+        if cfg is None:
+            cfg = get_cfg_defaults()
+        elif type(cfg) is str:
+            cfg_file = cfg
+            cfg = get_cfg_defaults()
+            cfg.merge_from_file(cfg_file)
+        return cfg
 
     def detect_roi(self, image, BGR=False):
         """ Given an image, return the bounding boxes """
@@ -128,6 +138,25 @@ class Face_Anonymizer():
 
         return box_filtered
 
+    
+    def anonymize_rois(self, img, rois):
+        limit = img.shape 
+        for box in rois:
+            kx = int(max(box[2] - box[0], box[3] - box[1]) / 8) *2 + 1
+            kx = max(5, kx)
+            ksize = (kx, kx)
+            sigmaX = int(kx / 2)
+            color = (0,255,0)
+            box[0] = 0 if box[0] < 0 else box[0]
+            box[1] = 0 if box[1] < 0 else box[1]
+            box[2] = limit[1]-1 if box[2] > limit[1] else box[2]
+            box[3] = limit[0]-1 if box[3] > limit[0] else box[3]
+            img[int(box[1]):int(box[3]), int(box[0]):int(box[2])] = \
+                cv2.GaussianBlur(
+                    img[int(box[1]):int(box[3]), int(box[0]):int(box[2])],
+                    ksize,
+                    sigmaX)
+
 
 def show_results_xyxy(img, xyxy):
     h,w,c = img.shape
@@ -157,8 +186,7 @@ def parse_args():
     return args
 
 
-if __name__ == '__main__':
-
+def test_one():
     # Read the parameters
     cfg = get_cfg_defaults()
     args = parse_args()
@@ -180,10 +208,52 @@ if __name__ == '__main__':
 
         # Detect region of interest
         rois = fa.detect_roi(image, BGR=True)
+
+        fa.anonymize_rois(image, rois)
         
         # Visualize
         for roi in rois:
             show_results_xyxy(image, roi)
         cv2.imshow("ROI", image)
         cv2.waitKey(0)
+
+
+def test_two():
+    # Read the parameters
+    cfg = get_cfg_defaults()
+    args = parse_args()
+    if args.config_file:
+        cfg.merge_from_file(args.config_file)
+
+    # Initialize the anonymizer
+    fa = Face_Anonymizer(cfg)
+
+    # Go through all the images
+    # image_dir = cfg.IMAGE_DIR
+    # image_paths = sorted(os.listdir(image_dir))
+    video_path = '/home/henry/Documents/data/IMG_0465.MOV'
+    cap = cv2.VideoCapture(video_path)
+
+    cv2.namedWindow("ROI", cv2.WND_PROP_FULLSCREEN)
+
+    idx = 0
+    while(cap.isOpened()):
+        ret, image = cap.read()
+        idx = idx + 1
+        if idx % 6 != 0 or image is None:
+            continue
+        # Detect region of interest
+        rois = fa.detect_roi(image, BGR=True)
+        fa.anonymize_rois(image, rois)
+
+        
+        # Visualize
+        for roi in rois:
+            show_results_xyxy(image, roi)
+        cv2.imshow("ROI", image)
+        cv2.waitKey(100)
+
+
+if __name__ == '__main__':
+    test_two()
 
