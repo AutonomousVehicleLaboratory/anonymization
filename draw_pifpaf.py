@@ -154,11 +154,22 @@ def get_human_height(pp_kps):
         height = np.median(np.array(predicted_height))
     return height
 
+def get_ortho(a_2d):
+    res = np.array([a_2d[0], -1*a_2d[1]])
+    res /= np.linalg.norm(res)
+    if res[1] > 0:
+        res *= -1
+    return res
+
+def y_rot_mat(ang):
+    return np.array([[np.cos(ang), 0., np.sin(ang)], [0.,1.,0.], [-np.sin(ang), 0., np.cos(ang)]])
 
 def generate_head_bbox(pp_kps):
     torso_length_head_width_ratio = 2/5
     neck_to_head_height_ratio = 1/4
     head_aspect_ratio = 1.2
+    shoulder_torso_ratio = 1
+    shoulder_height_ratio = 0.23
     # if face_to_us(pp_kps):
     if joint_exist("face", pp_kps)  and joint_exist("shoulder", pp_kps):
         head_width = 0
@@ -182,22 +193,53 @@ def generate_head_bbox(pp_kps):
         box = ((head_bbox_x1, head_bbox_y1), (head_bbox_x2, head_bbox_y2))
         box_from_face = True
     elif joint_exist("shoulder", pp_kps, all_exist=True):
-        # 
-        head_middle_x, head_width  = get_joint_coor("shoulder", pp_kps)[0], (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
+        shoulder_center = get_joint_coor("shoulder", pp_kps)
+        head_width  = (np.amax(pp_kps[5:7, 0]) - np.amin(pp_kps[5:7, 0])) /1.5
         head_height = head_width * head_aspect_ratio
-        conf = get_joint_coor("shoulder", pp_kps)[2]
+        conf = shoulder_center[2]
+        '''
+            find vector orthogonal to shoulder vector
+        '''
+        # 
+        shoulder_vec = pp_kps[5,:2] - pp_kps[6,:2]
+        ortho_vec = get_ortho(shoulder_vec)
+        # calculate shoulder length ratio
+        normal_shoulder_length = 1
+        shown_shoulder_length = np.linalg.norm(shoulder_vec)
+        
         if joint_exist("hip", pp_kps):
-            head_width = (get_joint_coor("hip",pp_kps)[1] - get_joint_coor("shoulder",pp_kps)[1])*torso_length_head_width_ratio
-            conf = (get_joint_coor("hip",pp_kps)[2] + get_joint_coor("shoulder",pp_kps)[2]) /2
-        pred_head_bbox_x1, pred_head_bbox_x2 = int(head_middle_x - head_width/2), int(head_middle_x + head_width/2)
+            ortho_vec = (shoulder_center - get_joint_coor("hip",pp_kps))[:2]
+            torso_length = np.linalg.norm(ortho_vec)
+            normal_shoulder_length = shoulder_torso_ratio * torso_length
+            ortho_vec /= torso_length
+            head_width = torso_length * torso_length_head_width_ratio
+            conf = (get_joint_coor("hip",pp_kps)[2] + shoulder_center[2]) /2
+        
         # human height is around 6~8 head high, take average 7
-        # pred_head_bbox_y1 = int(get_joint_coor("shoulder", pp_kps)[1] - (pred_head_bbox_x2 - pred_head_bbox_x1))
         pred_human_height = get_human_height(pp_kps)
         if pred_human_height!=0:
             head_height = pred_human_height / 5.5
-        pred_head_bbox_y2 = int(get_joint_coor("shoulder", pp_kps)[1] - head_height * neck_to_head_height_ratio) 
-        pred_head_bbox_y1 = int(pred_head_bbox_y2 - head_height)
+            normal_shoulder_length = shoulder_height_ratio * pred_human_height
+        head_middle_y = shoulder_center[1] - head_height * (1+neck_to_head_height_ratio)/2
+
+        # calculate shoulder angle
+        head_offset_vec = np.array([0,0,1]).reshape((-1,1))
+        cos_ratio = shown_shoulder_length / normal_shoulder_length
+        cos_ratio = np.clip(cos_ratio, -1, 1)
+        shoulder_ang = np.arccos(cos_ratio)
+        head_offset_vec = (y_rot_mat(shoulder_ang) @ head_offset_vec).reshape(-1)
+        if not face_to_us(pp_kps):
+            head_offset_vec *= -1
+        # pred_head_bbox_y2 = int(get_joint_coor("shoulder", pp_kps)[1] - head_height * neck_to_head_height_ratio) 
+        # pred_head_bbox_y1 = int(pred_head_bbox_y2 - head_height)
         # print("predicted xyxy: ",pred_head_bbox_x1, pred_head_bbox_y1, pred_head_bbox_x2, pred_head_bbox_y2)
+        head_cen_to_shoulder_cen = head_middle_y - shoulder_center[1]
+        # print("shoulder: ", shoulder_center[:2])
+        # print("ortho: ", ortho_vec)
+        # print("head_offset: ", head_offset_vec[:2])
+        head_middle_coor = shoulder_center[:2] - head_cen_to_shoulder_cen * ortho_vec + head_offset_vec[:2] * normal_shoulder_length / 4
+        pred_head_bbox_x1, pred_head_bbox_x2 = int(head_middle_coor[0] - head_width/2), int(head_middle_coor[0] + head_width/2)
+        pred_head_bbox_y1, pred_head_bbox_y2 = int(head_middle_coor[1] - head_height/2), int(head_middle_coor[1] + head_height/2)
         box = ((pred_head_bbox_x1, pred_head_bbox_y1), (pred_head_bbox_x2, pred_head_bbox_y2))
         box_from_face = False
     
@@ -227,7 +269,7 @@ def predict_and_save(save_dir):
                 det_dict = {"xyxyconf": [box[0][0], box[0][1], box[1][0], box[1][1], round(conf, 4)], "box_from_face": box_from_face}
                 image_pred.append(det_dict)
         detection_dict[img_dest] = image_pred
-    output_path = os.path.join(save_dir, "pifpaf_pred_head.json")
+    output_path = os.path.join(save_dir, "pifpaf_pred_head_angle.json")
     if os.path.exists(output_path):
         print("A file with the same name as output file exists")
     else:
