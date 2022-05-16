@@ -7,13 +7,7 @@ SAVE_DIR: '/home/jliao/yolov5-face/output_dir/avt_cameras_camera6/'
 # DISPLAY_CROP: True
 
 LPD:
-  CLASSES: './data/classes/custom.names'
-  WEIGHTS: '/home/jliao/anonymization/weights/lpd'
-  ANCHORS: [12,16, 19,36, 40,28, 36,75, 76,55, 72,146, 142,110, 192,243, 459,401]
-  STRIDES: [8, 16, 32]
-  XYSCALE: [1.2, 1.1, 1.05]
-  ANCHOR_PER_SCALE: 3
-  IOU_LOSS_THRES: 0.5
-  CONF_THRES: 0.3
-  IOU_THRES: 0.5
-  RESIZE: 416
+  WEIGHTS: '/home/jliao/anonymization/weights/lpd.pt'
+  CONF_THRES: 0.5
+  IOU_THRES: 0.45
+  IMAGE_SIZE: 1024
