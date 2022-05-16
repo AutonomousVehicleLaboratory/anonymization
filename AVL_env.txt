@@ -19,10 +19,6 @@ yacs
 # Logging -------------------------------------
 tensorboard>=2.4.1
 
-# LPD -----------------------------------------
-tensorflow-gpu==2.3.0
-lxml
-absl-py
 
 # wandb
 
