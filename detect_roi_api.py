@@ -1,3 +1,4 @@
+from concurrent.futures import process
 import sys
 import os
 import cv2
@@ -7,6 +8,7 @@ import argparse
 from config.base_config_detect_face_api import get_cfg_defaults
 from detect_face_api import Face_Detector
 from detect_pose_api import Pose_Detector
+from detect_lp_api import LP_Detector
 from draw_pifpaf import generate_head_bbox
 
 
@@ -16,6 +18,7 @@ class Face_Anonymizer():
         cfg = self.get_default_cfg(cfg)
         self.face_detector = Face_Detector(cfg.FACE_DETECTOR)
         self.pose_detector = Pose_Detector(cfg.POSE_DETECTOR)
+        self.lp_detector = LP_Detector(cfg.LPD)
         self.fusion_method = 'conf_fusion'
 
 
@@ -37,10 +40,11 @@ class Face_Anonymizer():
         # start2 = timer()
         dets_pose = self.pose_detector.detect(image)
         # end2 = timer()
+        dets_lp = self.lp_detector.detect(image, BGR=BGR)
         # print('time:', end1 - start1, end2 - start2)
         dets_head = self.generate_head_from_pose(dets_pose)
         dets_roi = self.fuse_detections(dets_face, dets_head, method=self.fusion_method)
-        return dets_roi
+        return dets_roi, dets_lp
 
 
     def generate_head_from_pose(self, dets_pose):
@@ -151,21 +155,23 @@ class Face_Anonymizer():
             box[1] = 0 if box[1] < 0 else box[1]
             box[2] = limit[1]-1 if box[2] > limit[1] else box[2]
             box[3] = limit[0]-1 if box[3] > limit[0] else box[3]
-            img[int(box[1]):int(box[3]), int(box[0]):int(box[2])] = \
-                cv2.GaussianBlur(
-                    img[int(box[1]):int(box[3]), int(box[0]):int(box[2])],
-                    ksize,
-                    sigmaX)
+            if int(box[3]) > int(box[1]) and int(box[2]) > int(box[0]):
+                img[int(box[1]):int(box[3]), int(box[0]):int(box[2])] = \
+                    cv2.GaussianBlur(
+                        img[int(box[1]):int(box[3]), int(box[0]):int(box[2])],
+                        ksize,
+                        sigmaX)
 
 
-def show_results_xyxy(img, xyxy):
-    h,w,c = img.shape
-    tl = 2 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
-    x1 = int(xyxy[0])
-    y1 = int(xyxy[1])
-    x2 = int(xyxy[2])
-    y2 = int(xyxy[3])
-    cv2.rectangle(img, (x1,y1), (x2, y2), (0,255,0), thickness=tl, lineType=cv2.LINE_AA)
+def show_results_xyxy(img, xyxys):
+    for xyxy in xyxys:
+        h,w,c = img.shape
+        tl = 2 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
+        x1 = int(xyxy[0])
+        y1 = int(xyxy[1])
+        x2 = int(xyxy[2])
+        y2 = int(xyxy[3])
+        cv2.rectangle(img, (x1,y1), (x2, y2), (0,255,0), thickness=tl, lineType=cv2.LINE_AA)
 
     return img
 
@@ -207,13 +213,12 @@ def test_one():
         assert image is not None, 'Image Not Found ' + image_path
 
         # Detect region of interest
-        rois = fa.detect_roi(image, BGR=True)
+        rois, lps = fa.detect_roi(image, BGR=True)
 
         fa.anonymize_rois(image, rois)
         
         # Visualize
-        for roi in rois:
-            show_results_xyxy(image, roi)
+        show_results_xyxy(image, rois)
         cv2.imshow("ROI", image)
         cv2.waitKey(0)
 
@@ -243,17 +248,64 @@ def test_two():
         if idx % 6 != 0 or image is None:
             continue
         # Detect region of interest
-        rois = fa.detect_roi(image, BGR=True)
+        rois, lps = fa.detect_roi(image, BGR=True)
         fa.anonymize_rois(image, rois)
 
         
         # Visualize
-        for roi in rois:
-            show_results_xyxy(image, roi)
+        show_results_xyxy(image, rois)
         cv2.imshow("ROI", image)
         cv2.waitKey(100)
 
 
+def process_a_bag(fa, rosbag_dir):
+    for folder_item in os.listdir(rosbag_dir):
+        if not folder_item.startswith('avt') or folder_item.endswith('_anonymized'):
+            continue
+
+        image_dir = os.path.join(rosbag_dir, folder_item)
+        image_names = sorted(os.listdir(image_dir))
+        image_output_dir = os.path.join(rosbag_dir, folder_item + '_anonymized')
+        if not os.path.exists(image_output_dir):
+            os.mkdir(image_output_dir)
+
+        # cv2.namedWindow("ROI", cv2.WND_PROP_FULLSCREEN)
+
+        for image_name in image_names:
+            image_path = os.path.join(image_dir, image_name)
+            image = cv2.imread(image_path)  # BGR
+            if image is None:
+                print('Image Not Found ' + image_path)
+                continue
+
+            # Detect region of interest
+            rois, lps = fa.detect_roi(image, BGR=True)
+
+            fa.anonymize_rois(image, rois)
+            fa.anonymize_rois(image, lps)
+            # Visualize
+            # show_results_xyxy(image, rois)
+            # cv2.imshow("ROI", image)
+            # cv2.waitKey(0)
+            cv2.imwrite(os.path.join(image_output_dir, image_name), image)
+
+
+def test_process_a_bag():
+    # Read the parameters
+    cfg = get_cfg_defaults()
+    args = parse_args()
+    cfg.merge_from_file("config/default_api.yaml")
+
+    # Initialize the anonymizer
+    fa = Face_Anonymizer(cfg)
+
+    # Go through all the images
+    rosbag_dir = "/home/henry/Documents/data/ros/05-13-2022/hopkins/2022-05-13-11-49-59_2"
+    
+    process_a_bag(fa, rosbag_dir)
+
+
+
 if __name__ == '__main__':
-    test_two()
+    test_process_a_bag()
 

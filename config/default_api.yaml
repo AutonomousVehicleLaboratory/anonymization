@@ -16,6 +16,13 @@ FACE_DETECTOR:
   CONF_THRES: 0.3
   IOU_THRES: 0.5
 
+# License Plate Detector parameters
+LPD:
+  WEIGHTS: '/home/henry/Documents/projects/avl/anonymization/weights/lpd.pt'
+  CONF_THRES: 0.5
+  IOU_THRES: 0.45
+  IMAGE_SIZE: 1024
+  
 # Tracker paraemters
 TRACKER:
   MAX_AGE: 5
