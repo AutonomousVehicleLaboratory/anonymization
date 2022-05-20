@@ -10,7 +10,7 @@ print('PyTorch version', torch.__version__)
 class Pose_Detector():
 
     def __init__(self, cfg):
-        self.model = openpifpaf.Predictor(checkpoint='shufflenetv2k30')
+        self.model = openpifpaf.Predictor(checkpoint='shufflenetv2k16')
 
 
     def detect(self, image, BGR=False):
