@@ -16,15 +16,14 @@ from utils.general import check_img_size, check_requirements, non_max_suppressio
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
-from config.base_config_lpd_api import get_cfg_default
+from config.base_config_detect_face_api import get_cfg_defaults
 
-class LP_Anonymizer():
+class LP_Detector():
     def __init__(self, cfg):
-        cfg = self.get_default_cfg(cfg)
-        self.model, self.device, self.stride = self.init_model(cfg.LPD.WEIGHTS)
-        self.iou_thres = cfg.LPD.IOU_THRES
-        self.conf_thres = cfg.LPD.CONF_THRES
-        self.size = cfg.LPD.IMAGE_SIZE
+        self.model, self.device, self.stride = self.init_model(cfg.WEIGHTS)
+        self.iou_thres = cfg.IOU_THRES
+        self.conf_thres = cfg.CONF_THRES
+        self.size = cfg.IMAGE_SIZE
 
     def init_model(self, weights):
         if torch.cuda.is_available():
@@ -37,14 +36,6 @@ class LP_Anonymizer():
         stride = int(model.stride.max()) 
         return model, device, stride
 
-    def get_default_cfg(self, cfg):
-        if cfg is None:
-            cfg = get_cfg_default()
-        elif type(cfg) is str:
-            cfg_file = cfg
-            cfg = get_cfg_default()
-            cfg.merge_from_file(cfg_file)
-        return cfg
 
     def detect(self, image, BGR=False):
         # print("start!")
@@ -81,37 +72,92 @@ class LP_Anonymizer():
                         xyxyconf = det[j, :5].cpu().numpy()
                         dets.append(xyxyconf)
         # print("end!")
-        return dets
-    def anonymize_rois(self, img, rois):
-        limit = img.shape 
-        for box in rois:
-            kx = int(max(box[2] - box[0], box[3] - box[1]) / 8) *2 + 1
-            kx = max(5, kx)
-            ksize = (kx, kx)
-            sigmaX = int(kx / 2)
-            color = (0,255,0)
-            box[0] = 0 if box[0] < 0 else box[0]
-            box[1] = 0 if box[1] < 0 else box[1]
-            box[2] = limit[1]-1 if box[2] > limit[1] else box[2]
-            box[3] = limit[0]-1 if box[3] > limit[0] else box[3]
-            img[int(box[1]):int(box[3]), int(box[0]):int(box[2])] = \
-                cv2.GaussianBlur(
-                    img[int(box[1]):int(box[3]), int(box[0]):int(box[2])],
-                    ksize,
-                    sigmaX)
-
-        
+        return dets    
 
 
-if __name__ =='__main__':
+def test_one():
     # w = torch.load("/home/jliao/Vehicle-number-plate-recognition-YOLOv5/yolov5/runs/train/exp6/weights/best.pt")
     # # print(type(w['model']))
     # for k in w: print(k, type(w[k]))
     # for k in w['shared_layers']: print("Shared layer", k)
     anonymizer_path = '/home/jliao/anonymization'
     LPD_config_file = anonymizer_path + '/config/lpd.yaml'
-    lpd_anonymizer = LP_Anonymizer(LPD_config_file)
+    lpd_anonymizer = LP_Detector(LPD_config_file.LPD)
     img_path = "/home/jliao/rosbags/2020-08-17-19-02-50.bag/camera6/2481.png"
     img = cv2.imread(img_path)
     res = lpd_anonymizer.detect(img, True)
     print(res)
+
+
+def parse_args():
+    """ Parse the command line arguments """
+
+    import sys
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='cam_lidar_calibration')
+    parser.add_argument(
+        '--cfg',
+        dest='config_file',
+        default='',
+        metavar='FILE',
+        help='path to config file',
+        type=str,
+    )
+
+    args = parser.parse_args(sys.argv[1:])
+    return args
+
+
+def test_lpd():
+    import os
+    from config.base_config_detect_face_api import get_cfg_defaults
+    
+    # Read the parameters
+    cfg = get_cfg_defaults()
+    args = parse_args()
+    if args.config_file:
+        cfg.merge_from_file(args.config_file)
+
+    # Initialize the anonymizer
+    pd = LP_Detector(cfg.LPD)
+
+    # Go through all the images
+    image_dir = cfg.IMAGE_DIR
+    image_paths = sorted(os.listdir(image_dir))
+    for image_path in image_paths:
+        image = cv2.imread(os.path.join(image_dir, image_path))  # BGR
+        assert image is not None, 'Image Not Found ' + image_path
+
+        # Detect region of interest
+        roi = pd.detect(image, BGR=True)
+        print(roi)
+
+
+def test_lpd():
+    import os
+    from config.base_config_detect_face_api import get_cfg_defaults
+    
+    # Read the parameters
+    cfg = get_cfg_defaults()
+    args = parse_args()
+    cfg.merge_from_file("config/henry_api.yaml") # default_api.yaml
+
+    # Initialize the anonymizer
+    pd = LP_Detector(cfg.LPD)
+
+    # Go through all the images
+    image_dir = "/home/henry/Documents/data/license_plate_sample"
+    image_paths = sorted(os.listdir(image_dir))
+    for image_path in image_paths:
+        image = cv2.imread(os.path.join(image_dir, image_path))  # BGR
+        assert image is not None, 'Image Not Found ' + image_path
+
+        # Detect region of interest
+        roi = pd.detect(image, BGR=True)
+        print(roi)
+
+
+if __name__ == '__main__':
+    test_lpd()
+
