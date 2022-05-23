@@ -4,12 +4,17 @@ import os
 import cv2
 import numpy as np
 import argparse
+from pathlib import Path
+import glob
+import re
+import json
+from anonymization.detect_face import show_results, show_results_xyxys
 
 from config.base_config_detect_face_api import get_cfg_defaults
 from detect_face_api import Face_Detector
 from detect_pose_api import Pose_Detector
 from detect_lp_api import LP_Detector
-from draw_pifpaf import generate_head_bbox
+from draw_pifpaf import generate_head_bbox, draw_skeleton
 
 
 class Face_Anonymizer():
@@ -20,6 +25,11 @@ class Face_Anonymizer():
         self.pose_detector = Pose_Detector(cfg.POSE_DETECTOR)
         self.lp_detector = LP_Detector(cfg.LPD)
         self.fusion_method = 'conf_fusion'
+        self.save_dir = Path(self.increment_path(Path(cfg.SAVE_DIR) / "exp", exist_ok=False))
+        self.save_json = cfg.SAVE_TRACKING
+        self.viz = cfg.DISPLAY_RESULTS
+        self.show_pifpaf = cfg.DISPLAY_PIFPAF
+        self.debug_mode_show = cfg.DISPLAY_DEBUG_MODE
 
 
     def get_default_cfg(self, cfg):
@@ -30,6 +40,18 @@ class Face_Anonymizer():
             cfg = get_cfg_defaults()
             cfg.merge_from_file(cfg_file)
         return cfg
+
+    def increment_path(path, exist_ok=True, sep=''):
+        # Increment path, i.e. runs/exp --> runs/exp{sep}0, runs/exp{sep}1 etc.
+        path = Path(path)  # os-agnostic
+        if (path.exists() and exist_ok) or (not path.exists()):
+            return str(path)
+        else:
+            dirs = glob.glob(f"{path}{sep}*")  # similar paths
+            matches = [re.search(rf"%s{sep}(\d+)" % path.stem, d) for d in dirs]
+            i = [int(m.groups()[0]) for m in matches if m]  # indices
+            n = max(i) + 1 if i else 2  # increment number
+            return f"{path}{sep}{n}"  # update path
 
     def detect_roi(self, image, BGR=False):
         """ Given an image, return the bounding boxes """
@@ -44,6 +66,24 @@ class Face_Anonymizer():
         # print('time:', end1 - start1, end2 - start2)
         dets_head = self.generate_head_from_pose(dets_pose)
         dets_roi = self.fuse_detections(dets_face, dets_head, method=self.fusion_method)
+        if self.save_json:
+            with open(os.path.join(self.save_dir, "detection_pifpaf.json"),'w') as fp:
+                json.dump(dets_pose)
+            with open(os.path.join(self.save_dir, "detection_face.json"),'w') as ff:
+                json.dump(dets_face)
+            with open(os.path.join(self.save_dir, "detection_lp.json"),'w') as flp:
+                json.dump(dets_pose)
+            with open(os.path.join(self.save_dir, "detection_head_fusion.json"),'w') as froi:
+                json.dump(dets_roi)
+        if self.viz:
+            show_results_xyxys(image, dets_roi)
+        if self.debug_mode_show:
+            show_results_xyxys(image, dets_face, mode="face")
+            show_results_xyxys(image, dets_head, mode="head")
+        if self.show_pifpaf:
+            for pp_dict in dets_pose:
+                pp_kps = np.asarray(pp_dict['keypoints'])
+                draw_skeleton(image, pp_kps)
         return dets_roi, dets_lp
 
 
@@ -163,9 +203,9 @@ class Face_Anonymizer():
                         sigmaX)
 
 
-def show_results_xyxy(img, xyxys):
+def show_results_xyxy(img, xyxys, mode="roi"):
     for xyxy in xyxys:
-        h,w,c = img.shape
+        h,w,_ = img.shape
         tl = 2 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
         x1 = int(xyxy[0])
         y1 = int(xyxy[1])
