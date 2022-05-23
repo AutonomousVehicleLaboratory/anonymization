@@ -227,6 +227,10 @@ def parse_args():
         help='path to config file',
         type=str,
     )
+    parser.add_argument(
+        "--dir", 
+        type=str, 
+        help='the directory of extracted rosbag data')
 
     args = parser.parse_args(sys.argv[1:])
     return args
@@ -340,7 +344,8 @@ def test_process_a_bag():
     fa = Face_Anonymizer(cfg)
 
     # Go through all the images
-    rosbag_dir = "/home/henry/Documents/data/ros/05-13-2022/hopkins/2022-05-13-11-49-59_2"
+    rosbag_dir = args.dir
+    # rosbag_dir = "/home/henry/Documents/data/ros/05-16-2022/voigt/2022-05-16-16-37-59_0"
     
     process_a_bag(fa, rosbag_dir)
 
