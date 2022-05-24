@@ -1,13 +1,13 @@
 IMAGE_DIR: '/media/henry/Files/datasets/avl/clustering/2021-10-26-17-08-32/avt_cameras_camera6_image_color_compressed/'
 SAVE_DIR: '/home/henry/Documents/projects/avl/anonymization/output_dir/avt_cameras_camera6/'
-SAVE_TRACKING: False
-TRACK_ONLY: True
+SAVE_JSON: True
 WRITE_VIDEO: False
-DISPLAY_RESULTS: True
-DISPLAY_YOLO5FACE: True
-DISPLAY_PIFPAF: True
-PREDICT_PIFPAF_HEAD: True
-DISPLAY_CROP: True
+DISPLAY_RESULTS: False
+DISPLAY_YOLO5FACE: False
+DISPLAY_PIFPAF: False
+PREDICT_PIFPAF_HEAD: False
+DISPLAY_CROP: False
+DISPLAY_DEBUG_MODE: False
 
 # Face Detector parameters
 FACE_DETECTOR:

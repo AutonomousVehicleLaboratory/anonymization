@@ -8,7 +8,7 @@ from pathlib import Path
 import glob
 import re
 import json
-from anonymization.detect_face import show_results, show_results_xyxys
+from detect_face import show_results, show_results_xyxys
 
 from config.base_config_detect_face_api import get_cfg_defaults
 from detect_face_api import Face_Detector
@@ -25,11 +25,16 @@ class Face_Anonymizer():
         self.pose_detector = Pose_Detector(cfg.POSE_DETECTOR)
         self.lp_detector = LP_Detector(cfg.LPD)
         self.fusion_method = 'conf_fusion'
-        self.save_dir = Path(self.increment_path(Path(cfg.SAVE_DIR) / "exp", exist_ok=False))
-        self.save_json = cfg.SAVE_TRACKING
+        # self.save_dir = Path(self.increment_path(Path(cfg.SAVE_DIR) / "exp", exist_ok=False))
+        self.save_json = cfg.SAVE_JSON
         self.viz = cfg.DISPLAY_RESULTS
         self.show_pifpaf = cfg.DISPLAY_PIFPAF
         self.debug_mode_show = cfg.DISPLAY_DEBUG_MODE
+        self.face = None
+        self.head = None
+        self.pose = None
+        self.lp = None
+        self.roi = None
 
 
     def get_default_cfg(self, cfg):
@@ -41,17 +46,23 @@ class Face_Anonymizer():
             cfg.merge_from_file(cfg_file)
         return cfg
 
-    def increment_path(path, exist_ok=True, sep=''):
+    def increment_path(self, path, exist_ok=True, sep=''):
         # Increment path, i.e. runs/exp --> runs/exp{sep}0, runs/exp{sep}1 etc.
         path = Path(path)  # os-agnostic
         if (path.exists() and exist_ok) or (not path.exists()):
-            return str(path)
+            save_dir = str(path)
         else:
             dirs = glob.glob(f"{path}{sep}*")  # similar paths
             matches = [re.search(rf"%s{sep}(\d+)" % path.stem, d) for d in dirs]
             i = [int(m.groups()[0]) for m in matches if m]  # indices
             n = max(i) + 1 if i else 2  # increment number
-            return f"{path}{sep}{n}"  # update path
+            save_dir = f"{path}{sep}{n}"  # update path
+        
+        if not Path(save_dir).exists():
+            os.mkdir(save_dir)
+        
+        return save_dir
+
 
     def detect_roi(self, image, BGR=False):
         """ Given an image, return the bounding boxes """
@@ -66,15 +77,22 @@ class Face_Anonymizer():
         # print('time:', end1 - start1, end2 - start2)
         dets_head = self.generate_head_from_pose(dets_pose)
         dets_roi = self.fuse_detections(dets_face, dets_head, method=self.fusion_method)
-        if self.save_json:
-            with open(os.path.join(self.save_dir, "detection_pifpaf.json"),'w') as fp:
-                json.dump(dets_pose)
-            with open(os.path.join(self.save_dir, "detection_face.json"),'w') as ff:
-                json.dump(dets_face)
-            with open(os.path.join(self.save_dir, "detection_lp.json"),'w') as flp:
-                json.dump(dets_pose)
-            with open(os.path.join(self.save_dir, "detection_head_fusion.json"),'w') as froi:
-                json.dump(dets_roi)
+        
+        self.face = dets_face
+        self.head = dets_head
+        self.roi = dets_roi
+        self.lp = dets_lp
+        self.pose = [pose['keypoints'] for pose in dets_pose]
+
+        # if self.save_json:
+        #     with open(os.path.join(self.save_dir, "detection_pifpaf.json"),'w') as fp:
+        #         json.dump(dets_pose)
+        #     with open(os.path.join(self.save_dir, "detection_face.json"),'w') as ff:
+        #         json.dump(dets_face)
+        #     with open(os.path.join(self.save_dir, "detection_lp.json"),'w') as flp:
+        #         json.dump(dets_pose)
+        #     with open(os.path.join(self.save_dir, "detection_head_fusion.json"),'w') as froi:
+        #         json.dump(dets_roi)
         if self.viz:
             show_results_xyxys(image, dets_roi)
         if self.debug_mode_show:
@@ -83,7 +101,7 @@ class Face_Anonymizer():
         if self.show_pifpaf:
             for pp_dict in dets_pose:
                 pp_kps = np.asarray(pp_dict['keypoints'])
-                draw_skeleton(image, pp_kps)
+                draw_skeleton(image, pp_kps, False)
         return dets_roi, dets_lp
 
 
@@ -304,18 +322,21 @@ def test_two():
 
 def process_a_bag(fa, rosbag_dir):
     for folder_item in os.listdir(rosbag_dir):
-        if not folder_item.startswith('avt') or folder_item.endswith('_anonymized'):
+        if not folder_item.startswith('avt') or not folder_item.endswith('color'):
             continue
 
         image_dir = os.path.join(rosbag_dir, folder_item)
         image_names = sorted(os.listdir(image_dir))
         image_output_dir = os.path.join(rosbag_dir, folder_item + '_anonymized')
+        det_path = os.path.join(rosbag_dir, folder_item + '_det.json')
+        det_dict = {}
         if not os.path.exists(image_output_dir):
             os.mkdir(image_output_dir)
 
         # cv2.namedWindow("ROI", cv2.WND_PROP_FULLSCREEN)
 
         for image_name in image_names:
+            det_frame_dict = {}
             image_path = os.path.join(image_dir, image_name)
             image = cv2.imread(image_path)  # BGR
             if image is None:
@@ -327,11 +348,26 @@ def process_a_bag(fa, rosbag_dir):
 
             fa.anonymize_rois(image, rois)
             fa.anonymize_rois(image, lps)
+
+            det_frame_dict['roi'] = [roi.tolist() for roi in fa.roi]
+            det_frame_dict['face'] = [face.tolist() for face in fa.face]
+            det_frame_dict['head'] = [head.tolist() for head in fa.head]
+            det_frame_dict['pose'] = [pose.tolist() for pose in fa.pose]
+            det_frame_dict['lp'] = [lp.tolist() for lp in fa.lp]
+            # print(det_frame_dict['lp'])
+            det_dict[image_name] = det_frame_dict
+
             # Visualize
             # show_results_xyxy(image, rois)
             # cv2.imshow("ROI", image)
             # cv2.waitKey(0)
             cv2.imwrite(os.path.join(image_output_dir, image_name), image)
+        
+        with open(det_path, 'w') as fp:
+            json.dump(det_dict, fp)
+            print('detection json file written to ', det_path)
+
+
 
 
 def test_process_a_bag():

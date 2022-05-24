@@ -27,10 +27,11 @@ def get_cfg_defaults():
 
 _C.IMAGE_DIR = '/Users/morris/Desktop/rosbags_data/2021-10-26-17-08-32/avt_cameras_camera6_image_color_compressed/'
 _C.SAVE_DIR = '/Users/morris/Desktop/anonymization/output_dir/avt_cameras_camera6/'
-_C.TRACK_ONLY = True
 _C.WRITE_VIDEO = False
 _C.DISPLAY_RESULTS = True
 _C.DISPLAY_YOLO5FACE = True
+_C.DISPLAY_DEBUG_MODE = False
+_C.SAVE_JSON = True
 
 # openpifpaf config
 _C.DISPLAY_PIFPAF = True
@@ -69,6 +70,3 @@ _C.TRACKER.MIN_HITS = 0
 _C.TRACKER.IOU_THRES = 0.3
 _C.TRACKER.DISTANCE_THRESHOLD = 100
 _C.TRACKER.SIZE_DIST_RATIO = 0.3
-
-# Save the result of tracking to a json file for evaluation.
-_C.SAVE_TRACKING = True
