@@ -9,6 +9,7 @@ Reference: http://wiki.ros.org/rosbag/Cookbook
 from __future__ import print_function
 import os
 from os import path as osp
+from time import sleep
 import numpy as np
 import rosbag
 import pypcd
@@ -20,10 +21,26 @@ import argparse
 from utils_ros import pointcloud2_to_xyz_intensity_array
 
 
+def msg_write_check_image(filename, msg, trial_count=10):
+    np_arr = np.fromstring(msg.data, np.uint8)
+    image_in = np_arr.reshape(msg.height, msg.width, -1)
+    cv2.imwrite(filename, image_in)
+    if trial_count < 10:
+        sleep(0.1)
+    img = cv2.imread(filename)
+    if img is None and trial_count > 0:
+        print('image write failed, ', trial_count, ' times left for ', filename)
+        msg_write_check_image(filename, msg, trial_count-1)
+    else:
+        if trial_count < 3 and trial_count > 0:
+            print('image rewrite success for ', filename)   
+
+
 def test_bag_to_files(bag_path, dir=None):
     """Convert a rosbag to files. Only certain topics are accepted.
     Place the large topics in topic_large, small topics in topic_dict
     """
+    print("processing rosbag:", bag_path)
     bag_name = bag_path.split("/")[-1]
     if dir is None:
         output_dir = bag_path[0:-4]
@@ -101,11 +118,9 @@ def test_bag_to_files(bag_path, dir=None):
             cv2.imwrite(filename, image_in)
         elif msg._type == 'sensor_msgs/Image':
             image_format = 'png'
-            np_arr = np.fromstring(msg.data, np.uint8)
-            image_in = np_arr.reshape(msg.height, msg.width, -1)
             filename = osp.join(topic_dir, '{}.{}'.format(timestamp_string, image_format))
-            cv2.imwrite(filename, image_in)
-        
+            msg_write_check_image(filename, msg)
+
         # For smaller topcis, we store them in a dictinary first
         elif msg._type == 'sensor_msgs/Imu':
             topic_dict[topic][timestamp_string] = msg2json(msg)
@@ -137,7 +152,8 @@ def test_bag_to_files(bag_path, dir=None):
 
 def msg2json(msg):
    ''' Convert a ROS message to JSON format'''
-   y = yaml.full_load(str(msg))
+   #y = yaml.full_load(str(msg))
+   y = yaml.load(str(msg))
    return y # json.dumps(y,indent=4)
 
 
@@ -149,6 +165,7 @@ def cmdline_args():
     
     p.add_argument("bagfile_path", help='Path to the rosbag ')
     p.add_argument("--dir", type=str, help='the directory data will be extracted to')
+    p.add_argument('--overwrite', action='store_true', help='skip bag if folder exist')
     return(p.parse_args())
 
 
@@ -157,9 +174,20 @@ def main():
     print(args.bagfile_path)
     if args.dir is not None:
         print("output dir", args.dir)
-    
-    test_bag_to_files(args.bagfile_path, args.dir)
 
+    if args.bagfile_path.endswith('bag'):
+        # process a single bag
+        test_bag_to_files(args.bagfile_path, args.dir)
+    else:
+        # process a folder of bags
+        bag_list = [item for item in os.listdir(args.bagfile_path) if item.endswith('.bag')]
+        print(bag_list)
+        for bag_name in bag_list:
+            bag_path = os.path.join(args.bagfile_path, bag_name)
+            print(args.overwrite)
+            print(os.path.exists(bag_path[0:-4]), bag_path[0:-4])
+	    if args.overwrite==True or not os.path.exists(bag_path[0:-4]):
+                test_bag_to_files(bag_path, args.dir)
 
 if __name__ == "__main__":
     main()

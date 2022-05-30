@@ -191,6 +191,10 @@ def parse_args():
         "--dir", 
         type=str, 
         help='the directory of extracted rosbag data')
+    parser.add_argument(
+        '--multiple', 
+        action='store_true', 
+        help="process multiple extracted rosbag dir in this folder")
 
     args = parser.parse_args(sys.argv[1:])
     return args
@@ -263,6 +267,7 @@ def test_two():
 
 
 def process_a_bag(fa, rosbag_dir):
+    print("processing: ", rosbag_dir)
     for folder_item in os.listdir(rosbag_dir):
         if not folder_item.startswith('avt') or folder_item.endswith('_anonymized'):
             continue
@@ -298,7 +303,10 @@ def test_process_a_bag():
     # Read the parameters
     cfg = get_cfg_defaults()
     args = parse_args()
-    cfg.merge_from_file("config/default_api.yaml")
+    if args.config_file:
+        cfg.merge_from_file(args.config_file)
+    else:
+        cfg.merge_from_file("config/default_api.yaml")
 
     # Initialize the anonymizer
     fa = Face_Anonymizer(cfg)
@@ -310,7 +318,27 @@ def test_process_a_bag():
     process_a_bag(fa, rosbag_dir)
 
 
+def test_process_multiple_bags():
+    cfg = get_cfg_defaults()
+    args = parse_args()
+    if args.config_file:
+        cfg.merge_from_file(args.config_file)
+    else:
+        cfg.merge_from_file("config/default_api.yaml")
+
+    fa = Face_Anonymizer(cfg)
+
+    if args.multiple==True:
+        dir_list = sorted([item for item in os.listdir(args.dir) if not item.endswith(".bag")])
+        print(dir_list)
+        for dir_name in dir_list:
+            rosbag_dir = os.path.join(args.dir, dir_name)
+            process_a_bag(fa, rosbag_dir)
+    else:
+        rosbag_dir = args.dir
+        process_a_bag(fa, rosbag_dir)
+
 
 if __name__ == '__main__':
-    test_process_a_bag()
+    test_process_multiple_bags()
 
