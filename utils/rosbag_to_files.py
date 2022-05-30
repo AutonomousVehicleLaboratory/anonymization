@@ -180,7 +180,7 @@ def main():
         test_bag_to_files(args.bagfile_path, args.dir)
     else:
         # process a folder of bags
-        bag_list = [item for item in os.listdir(args.bagfile_path) if item.endswith('.bag')]
+        bag_list = sorted([item for item in os.listdir(args.bagfile_path) if item.endswith('.bag')])
         print(bag_list)
         for bag_name in bag_list:
             bag_path = os.path.join(args.bagfile_path, bag_name)
