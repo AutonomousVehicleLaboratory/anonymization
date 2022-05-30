@@ -69,7 +69,7 @@ def show_tracking(img, xyxyconfs, colors):
     return img
 
 
-def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
+def show_results(img, xywh, conf=None, landmarks=None, class_num = 1, show_landmarks = False):
     h,w,c = img.shape
     tl = 2 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
     x1 = int(xywh[0] * w - 0.5 * xywh[2] * w)
@@ -79,7 +79,7 @@ def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
     cv2.rectangle(img, (x1,y1), (x2, y2), (0,255,0), thickness=tl, lineType=cv2.LINE_AA)
 
     
-    if show_landmarks:
+    if show_landmarks and landmarks != None:
         clors = [(255,0,0),(0,255,0),(0,0,255),(255,255,0),(0,255,255)]
         for i in range(5):
             point_x = int(landmarks[2 * i] * w)
@@ -91,6 +91,20 @@ def show_results(img, xywh, conf, landmarks, class_num, show_landmarks = False):
     # cv2.putText(img, label, (x1, y1 - 2), 0, tl / 2, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
     return img
 
+def show_results_xyxys(img, xyxys, mode="roi"):
+    mode2color = {"roi":(0,255,0), "face":(255,0,0), "head":(0,0,255)}
+    color = mode2color[mode]
+    for xyxy in xyxys:
+        h,w,_ = img.shape
+        tl = 2 or round(0.002 * (h + w) / 2) + 1  # line/font thickness
+        x1 = int(xyxy[0])
+        y1 = int(xyxy[1])
+        x2 = int(xyxy[2])
+        y2 = int(xyxy[3])
+        cv2.rectangle(img, (x1,y1), (x2, y2), color=color, thickness=tl, lineType=cv2.LINE_AA)
+    
+
+    return img
 
 def show_results_xyxy(img, xyxy):
     h,w,c = img.shape
