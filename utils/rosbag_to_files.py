@@ -166,6 +166,7 @@ def cmdline_args():
     p.add_argument("bagfile_path", help='Path to the rosbag ')
     p.add_argument("--dir", type=str, help='the directory data will be extracted to')
     p.add_argument('--overwrite', action='store_true', help='skip bag if folder exist')
+    p.add_argument('--remove', action='store_true', help='remove bag after extraction')
     return(p.parse_args())
 
 
@@ -184,10 +185,11 @@ def main():
         print(bag_list)
         for bag_name in bag_list:
             bag_path = os.path.join(args.bagfile_path, bag_name)
-            print(args.overwrite)
-            print(os.path.exists(bag_path[0:-4]), bag_path[0:-4])
 	    if args.overwrite==True or not os.path.exists(bag_path[0:-4]):
                 test_bag_to_files(bag_path, args.dir)
+    		if args.remove==True:
+		    print("Removing bag file:", bag_path)
+		    os.remove(bag_path)
 
 if __name__ == "__main__":
     main()
