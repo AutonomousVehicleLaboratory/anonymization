@@ -44,6 +44,8 @@ class AnomymizationViewer(object):
             if not self.image_idx > 0:
                 self.image_idx = 1
             return self.image_path_list[-self.image_idx].split('/')[-1]
+        
+        self.image_idx = 0
 
     
     def set_image_title(self, title):
