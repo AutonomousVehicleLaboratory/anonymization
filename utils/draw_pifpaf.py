@@ -1,18 +1,5 @@
-# -*- coding: UTF-8 -*-
-import argparse
-import time
-from pathlib import Path
-import os
-import sys
-import cv2
-import torch
-import torch.backends.cudnn as cudnn
 import numpy as np
-from numpy import random
-import json
-import copy
-
-from config.base_config_detect_face import get_cfg_defaults
+import cv2
 
 
 general_keyareas = {}
@@ -36,6 +23,7 @@ KINEMATIC_TREE_SKELETON = [
     (6, 12), (12, 14), (14, 16),  # left side
     (7, 13), (13, 15), (15, 17),
 ]
+
 COCO_KEYPOINTS = [
     'nose',            # 0
     'left_eye',        # 1
@@ -56,9 +44,12 @@ COCO_KEYPOINTS = [
     'right_ankle',     # 16
 ]
 
-def draw_skeleton(img, pifpaf_keypoints, predict_head):
+
+def draw_skeleton(img, pifpaf_keypoints):
     # openpifpaf keypoints format: (x, y, confidence)
-    pp_kps = pifpaf_keypoints.reshape(-1,3)
+    pp_kps = np.array(pifpaf_keypoints).reshape(-1,3)
+    if len(pp_kps) == 0:
+        return img
     # draw skeleton by connecting different keypoint by coco default
     for pair in KINEMATIC_TREE_SKELETON:
         partA = pair[0] -1
@@ -71,12 +62,24 @@ def draw_skeleton(img, pifpaf_keypoints, predict_head):
         # if confidence is not zero, the keypoint exist, otherwise the keypoint would be at (0,0)
         if  not np.isclose(pp_kps[partA, 2],  0) and not np.isclose(pp_kps[partB, 2],  0):
             cv2.line(img, pp_kps[partA,:2].astype(int), pp_kps[partB,:2].astype(int), color, 2)
-    if predict_head:
-        box, box_from_face, conf = generate_head_bbox(pp_kps)
-        if box is not None:
-            color = (0, 0, 255) if box_from_face else (255, 255, 0)
-            cv2.rectangle(img, box[0], box[1], color, 1)
     return img
+
+
+def predict_and_draw_head(img, pifpaf_keypoints):
+    pp_kps = pifpaf_keypoints.reshape(-1,3)
+    box, box_from_face, conf = generate_head_bbox(pp_kps)
+    if box is not None:
+        color = (0, 0, 255) if box_from_face else (255, 255, 0)
+        cv2.rectangle(img, box[0], box[1], color, 1)
+    
+
+# def draw_skeleton_and_head(img, pifpaf_keypoints, predict_head):
+#     # openpifpaf keypoints format: (x, y, confidence)
+#     # draw skeleton by connecting different keypoint by coco default
+#     draw_skeleton(img, pifpaf_keypoints)
+#     if predict_head:
+#         predict_and_draw_head(img, pifpaf_keypoints)
+
 
 def face_to_us(pp_kps):
     left_x = get_joint_coor("left_body", pp_kps)[0]
@@ -84,6 +87,7 @@ def face_to_us(pp_kps):
     if left_x < right_x:
         return False
     return True
+
 
 def get_body_bbox(pp_kps):
     min_x, min_y, max_x, max_y = 1000, 1000, 0, 0
@@ -253,53 +257,3 @@ def generate_head_bbox(pp_kps):
     #     conf = None
     #     # else, get body left most and right most
     return box, box_from_face, conf
-
-def predict_and_save(save_dir):
-    pifpaf_path = os.path.join(save_dir, 'detection_pifpaf.json')
-    detection_dict = {}
-    with open(pifpaf_path) as fpif:
-        pifpaf_dict = json.load(fpif)
-    for img_dest, pp_dicts in pifpaf_dict.items():
-        image_pred = []
-        for pp_dict in pp_dicts:
-            pp_kps = np.asarray(pp_dict['keypoints'])
-            pp_kps = pp_kps.reshape(-1,3)
-            box, box_from_face, conf = generate_head_bbox(pp_kps)
-            if box is not None:
-                det_dict = {"xyxyconf": [box[0][0], box[0][1], box[1][0], box[1][1], round(conf, 4)], "box_from_face": box_from_face}
-                image_pred.append(det_dict)
-        detection_dict[img_dest] = image_pred
-    output_path = os.path.join(save_dir, "pifpaf_pred_head_angle.json")
-    if os.path.exists(output_path):
-        print("A file with the same name as output file exists")
-    else:
-        with open(output_path, 'w') as f:
-            json.dump(detection_dict, f)
-        print("head prediction saved!")
-
-
-def parse_args():
-    """ Parse the command line arguments """
-    parser = argparse.ArgumentParser(description='cam_lidar_calibration')
-    parser.add_argument(
-        '--cfg',
-        dest='config_file',
-        default='',
-        metavar='FILE',
-        help='path to config file',
-        type=str,
-    )
-
-    args = parser.parse_args(sys.argv[1:])
-    return args
-
-
-if __name__ == '__main__':
-    cfg = get_cfg_defaults()
-    args = parse_args()
-    if args.config_file:
-        cfg.merge_from_file(args.config_file)
-
-    save_dir = cfg.SAVE_DIR
-
-    predict_and_save(save_dir)

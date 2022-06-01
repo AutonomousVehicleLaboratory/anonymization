@@ -4,6 +4,7 @@ import json
 import argparse
 import cv2
 
+from draw_pifpaf import draw_skeleton
 
 class AnomymizationViewer(object):
     def __init__(self):
@@ -12,6 +13,8 @@ class AnomymizationViewer(object):
         cv2.namedWindow(self.window_name, cv2.WND_PROP_FULLSCREEN)
         self.image_path_list = []
         self.image_idx = 0
+        self.show_skeleton = False
+        self.print_control()
 
     def open_image(self, image_path):
         image = cv2.imread(image_path)  # BGR
@@ -21,6 +24,17 @@ class AnomymizationViewer(object):
         if not image_path in self.image_path_list:
             self.image_path_list.append(image_path)
         return image
+
+
+    def print_control(self):
+        print("\nControl:")
+        print("next new image: 'space' or 'Enter'")
+        print("previous shown image: 'a' or 'p")
+        print("next shown image: 'd' or 'n'")
+        print("show skeleton: 'k'")
+        print("quit: 'q'")
+        print("\n")
+
 
     def show(self, image):
         cv2.imshow(self.window_name, image)
@@ -33,18 +47,24 @@ class AnomymizationViewer(object):
             cv2.destroyAllWindows()
             exit(0)
         
-        if key == ord("p"):
+        if key == ord("p") or key == ord("a"):
             self.image_idx = self.image_idx + 1
             if not self.image_idx < len(self.image_path_list):
                 self.image_idx = len(self.image_path_list)
             return self.image_path_list[-self.image_idx].split('/')[-1]
         
-        if key == ord("n"):
+        if key == ord("n") or key == ord("d"):
             self.image_idx = self.image_idx - 1
             if not self.image_idx > 0:
                 self.image_idx = 1
             return self.image_path_list[-self.image_idx].split('/')[-1]
         
+        if key == ord("k"):
+            self.show_skeleton = not self.show_skeleton
+        
+        if key == ord("h"):
+            self.print_control()
+
         self.image_idx = 0
 
     
@@ -99,6 +119,8 @@ def process_a_dir(viewer, data_dir):
             viewer.show_results_xyxy(image, roi, color=(0,255,0))
             viewer.show_results_xyxy(image, lp, color=(255,0,0))
             viewer.set_image_title(image_path)
+            if viewer.show_skeleton:
+                draw_skeleton(image, pose)
             image_name = viewer.show(image)
             # cv2.imwrite(os.path.join(image_output_dir, image_name), image)
 

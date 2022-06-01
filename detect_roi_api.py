@@ -14,7 +14,7 @@ from config.base_config_detect_face_api import get_cfg_defaults
 from detect_face_api import Face_Detector
 from detect_pose_api import Pose_Detector
 from detect_lp_api import LP_Detector
-from draw_pifpaf import generate_head_bbox, draw_skeleton
+from utils.draw_pifpaf import generate_head_bbox, draw_skeleton, predict_and_draw_head
 
 
 class Face_Anonymizer():
@@ -101,7 +101,7 @@ class Face_Anonymizer():
         if self.show_pifpaf:
             for pp_dict in dets_pose:
                 pp_kps = np.asarray(pp_dict['keypoints'])
-                draw_skeleton(image, pp_kps, False)
+                draw_skeleton(image, pp_kps)
         return dets_roi, dets_lp
 
 

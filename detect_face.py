@@ -22,7 +22,7 @@ from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 from tracker.sort import Sort
 from config.base_config_detect_face import get_cfg_defaults
-from draw_pifpaf import draw_skeleton
+from utils.draw_pifpaf import draw_skeleton, predict_and_draw_head
 
 
 def load_model(weights, device):
@@ -799,7 +799,9 @@ def track_from_saved(cfg, image_dir, save_dir, show_landmark = False, detection_
                 for pp_dict in pifpaf_det:
                     pp_kps = np.asarray(pp_dict['keypoints'])
                     # if display_results or write_video:
-                    #     orgimg = draw_skeleton(orgimg, pp_kps, cfg.PREDICT_PIFPAF_HEAD)
+                    #     orgimg = draw_skeleton(orgimg, pp_kps))
+                    # if cfg.PREDICT_PIFPAF_HEAD:
+                    #     detect_and_draw_head(orgimg, pp_kps)
                 for pred_dict in pif_paf_pred:
                     xyxyconf = pred_dict['xyxyconf']
                     dets.append(xyxyconf)
