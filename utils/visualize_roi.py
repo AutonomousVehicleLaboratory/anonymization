@@ -13,7 +13,8 @@ class AnomymizationViewer(object):
         cv2.namedWindow(self.window_name, cv2.WND_PROP_FULLSCREEN)
         self.image_path_list = []
         self.image_idx = 0
-        self.show_skeleton = False
+        self.show_skeleton = True
+        self.show_conf = True
         self.print_control()
 
     def open_image(self, image_path):
@@ -31,7 +32,8 @@ class AnomymizationViewer(object):
         print("next new image: 'space' or 'Enter'")
         print("previous shown image: 'a' or 'p")
         print("next shown image: 'd' or 'n'")
-        print("show skeleton: 'k'")
+        print("toggle skeleton: 'k'")
+        print("toggle confidence: 'c'")
         print("quit: 'q'")
         print("\n")
 
@@ -61,6 +63,8 @@ class AnomymizationViewer(object):
         
         if key == ord("k"):
             self.show_skeleton = not self.show_skeleton
+        if key == ord("c"):
+            self.show_conf = not self.show_conf
         
         if key == ord("h"):
             self.print_control()
@@ -80,7 +84,10 @@ class AnomymizationViewer(object):
             y1 = int(xyxy[1])
             x2 = int(xyxy[2])
             y2 = int(xyxy[3])
-            cv2.rectangle(img, (x1,y1), (x2, y2), (0,255,0), thickness=tl, lineType=cv2.LINE_AA)
+            cv2.rectangle(img, (x1,y1), (x2, y2), color, thickness=tl, lineType=cv2.LINE_AA)
+
+            if self.show_conf:
+                cv2.putText(img, str(xyxy[4])[0:4], (x1,y1-10), 0, 0.9, color, 2, cv2.LINE_AA)
 
         return img
 
@@ -120,7 +127,7 @@ def process_a_dir(viewer, data_dir):
             viewer.show_results_xyxy(image, lp, color=(255,0,0))
             viewer.set_image_title(image_path)
             if viewer.show_skeleton:
-                draw_skeleton(image, pose)
+                draw_skeleton(image, pose, viewer.show_conf)
             image_name = viewer.show(image)
             # cv2.imwrite(os.path.join(image_output_dir, image_name), image)
 

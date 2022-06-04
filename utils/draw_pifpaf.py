@@ -45,7 +45,7 @@ COCO_KEYPOINTS = [
 ]
 
 
-def draw_skeleton(img, pifpaf_keypoints):
+def draw_skeleton(img, pifpaf_keypoints, show_conf=False):
     # openpifpaf keypoints format: (x, y, confidence)
     pp_kps = np.array(pifpaf_keypoints).reshape(-1,3)
     if len(pp_kps) == 0:
@@ -62,6 +62,17 @@ def draw_skeleton(img, pifpaf_keypoints):
         # if confidence is not zero, the keypoint exist, otherwise the keypoint would be at (0,0)
         if  not np.isclose(pp_kps[partA, 2],  0) and not np.isclose(pp_kps[partB, 2],  0):
             cv2.line(img, pp_kps[partA,:2].astype(int), pp_kps[partB,:2].astype(int), color, 2)
+    
+    if show_conf:
+        for kp_idx, kp in enumerate(pp_kps):
+            if kp[2] > 0:
+                cv2.putText(
+                    img, 
+                    str(kp[2])[0:4], 
+                    (int(max(0, kp[0]-120*(kp_idx % 2) + 30)),
+                    int(max(kp[1]-10, 0))), 
+                    0, 0.9, color, 2, cv2.LINE_AA)
+
     return img
 
 
