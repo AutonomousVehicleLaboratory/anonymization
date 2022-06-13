@@ -42,8 +42,9 @@ class AnomymizationViewer(object):
         print("next new image: 'space' or 'Enter'")
         print("previous shown image: 'a' or 'p")
         print("next shown image: 'd' or 'n'")
-        print("toggle skeleton: 'k'")
-        print("toggle confidence: 'c'")
+        print("jump to next folder: 'j'")
+        print("toggle skeleton(k), confidence(c), roi(r), yolo face(y), openpifpaf head(o)")
+        print("toggle lp(l), shrink head(s), apply blur(b)")
         print("quit: 'q'")
         print("\n")
 
