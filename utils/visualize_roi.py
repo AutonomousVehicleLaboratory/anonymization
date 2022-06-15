@@ -9,25 +9,27 @@ from draw_pifpaf import draw_skeleton
 
 class AnomymizationViewer(object):
 
-    def __init__(self):
+    def __init__(self, save=False, shrink_head=False):
         self.step = True
         self.window_name = "Viewer"
-        cv2.namedWindow(self.window_name, cv2.WND_PROP_FULLSCREEN)
+        if not save:
+            cv2.namedWindow(self.window_name, cv2.WND_PROP_FULLSCREEN)
         self.image_path_list = []
         self.image_idx = 0
-        self.show_skeleton = True
-        self.show_conf = True
+        self.show_skeleton = not save
+        self.show_conf = not save
         self.show_roi = True
-        self.apply_blur = False
+        self.apply_blur = True
         self.show_yolo = False
         self.show_openpifpaf_head = False
         self.show_lp = True
-        self.shrink_head = True
+        self.shrink_head = shrink_head
         self.shrink_head_ratio = 0.8
         self.print_control()
 
 
     def open_image(self, image_path):
+        print('open image:', image_path)
         image = cv2.imread(image_path)  # BGR
         if image is None:
             print('Image Not Found ' + image_path)
@@ -152,7 +154,8 @@ class AnomymizationViewer(object):
         
         return new_head_boxes
 
-def process_a_dir(viewer, data_dir, anony_source=True):
+
+def process_a_dir(viewer, data_dir, anony_source=True, save=False):
     print("processing: ", data_dir)
     for folder_item in os.listdir(data_dir):
         if not folder_item.startswith('avt'):
@@ -161,11 +164,16 @@ def process_a_dir(viewer, data_dir, anony_source=True):
         if anony_source:
             if not folder_item.endswith('anonymized'):
                 continue
-            det_path = os.path.join(data_dir, folder_item[0:-11] + '_det.json')
+            det_path = os.path.join(data_dir, folder_item[0:-11] + '_det_new.json')
         else:
             if not folder_item.endswith('color'):
                 continue
-            det_path = os.path.join(data_dir, folder_item + '_det.json')
+            det_path = os.path.join(data_dir, folder_item + '_det_new.json')
+
+        if save:
+            save_dir = os.path.join(data_dir, folder_item + '_save_box')
+            if not os.path.exists(save_dir):
+                os.mkdir(save_dir)
 
         image_dir = os.path.join(data_dir, folder_item)
         image_names = sorted(os.listdir(image_dir))
@@ -195,8 +203,8 @@ def process_a_dir(viewer, data_dir, anony_source=True):
                 if viewer.shrink_head:
                     head = viewer.shrink_head_boxes(head)
                 if viewer.apply_blur:
-                    viewer.anonymize_rois(image, face)
-                    viewer.anonymize_rois(image, head)
+                    viewer.anonymize_rois(image, roi)
+                    viewer.anonymize_rois(image, lp)
                 if viewer.show_roi:
                     viewer.show_results_xyxy(image, roi, color=(0,255,0))
                 if viewer.show_yolo:
@@ -205,14 +213,21 @@ def process_a_dir(viewer, data_dir, anony_source=True):
                     viewer.show_results_xyxy(image, head, color=(0,255,255))
                 if viewer.show_lp:
                     viewer.show_results_xyxy(image, lp, color=(255,0,0))
-                viewer.set_image_title(image_path)
                 if viewer.show_skeleton:
                     for p in pose:
                         draw_skeleton(image, p, viewer.show_conf)
-                image_name = viewer.show(image)
-                # cv2.imwrite(os.path.join(image_output_dir, image_name), image)
+                
+                if save:
+                    cv2.imwrite(os.path.join(save_dir, image_name), image)
+                    image_name = None
+                else:
+                    viewer.set_image_title(image_path)
+                    image_name = viewer.show(image)
+            elif image_name not in det_dict:
+                print('image not in dict:', image_name)
+                image_name = None
 
-            if image_name == None or image is None:
+            if image_name is None or image is None:
                 image_idx = image_idx + 1
                 if image_idx < len(image_names):
                     image_name = image_names[image_idx]
@@ -232,11 +247,22 @@ def parse_args():
     parser.add_argument(
         '--multiple', 
         action='store_true', 
-        help="process multiple extracted rosbag dir in this folder")
+        help="process multiple extracted rosbag dir in this folder"
+    )
     parser.add_argument(
         '--anony_source',
         action='store_false',
         help="use anonymized source"
+    )
+    parser.add_argument(
+        '--save',
+        action='store_true',
+        help='save the visualized content'
+    )
+    parser.add_argument(
+        '--shrink',
+        action='store_true',
+        help='shrink the head bounding box'
     )
 
     args = parser.parse_args(sys.argv[1:])
@@ -245,17 +271,22 @@ def parse_args():
 
 def test_process_multiple_bags():
     args = parse_args()
-    viewer = AnomymizationViewer()
+
+    if args.save==True and args.anony_source==True:
+        print('Batch save only for processing original images')
+        exit(0)
+    
+    viewer = AnomymizationViewer(save=args.save, shrink_head=args.shrink)
 
     if args.multiple==True:
         dir_list = sorted([item for item in os.listdir(args.dir) if not item.endswith(".bag")])
         print(dir_list)
         for dir_name in dir_list:
             data_dir = os.path.join(args.dir, dir_name)
-            process_a_dir(viewer, data_dir, args.anony_source)
+            process_a_dir(viewer, data_dir, args.anony_source, args.save)
     else:
         data_dir = args.dir
-        process_a_dir(viewer, data_dir)
+        process_a_dir(viewer, data_dir, args.anony_source, args.save)
 
 
 if __name__ == '__main__':
