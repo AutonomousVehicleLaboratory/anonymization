@@ -127,7 +127,8 @@ def process_a_dir(viewer, data_dir):
             viewer.show_results_xyxy(image, lp, color=(255,0,0))
             viewer.set_image_title(image_path)
             if viewer.show_skeleton:
-                draw_skeleton(image, pose, viewer.show_conf)
+                for p in pose:
+                    draw_skeleton(image, p, viewer.show_conf)
             image_name = viewer.show(image)
             # cv2.imwrite(os.path.join(image_output_dir, image_name), image)
 
