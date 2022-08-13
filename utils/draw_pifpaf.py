@@ -179,8 +179,8 @@ def get_ortho(a_2d):
 def y_rot_mat(ang):
     return np.array([[np.cos(ang), 0., np.sin(ang)], [0.,1.,0.], [-np.sin(ang), 0., np.cos(ang)]])
 
-def generate_head_bbox(pp_kps):
-    torso_length_head_width_ratio = 2/5
+def generate_head_bbox(pp_kps, shrink_ratio = 1.0):
+    torso_length_head_width_ratio = 2/5*shrink_ratio
     neck_to_head_height_ratio = 1/4
     head_aspect_ratio = 1.2
     shoulder_torso_ratio = 1

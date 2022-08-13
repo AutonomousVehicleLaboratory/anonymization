@@ -75,7 +75,7 @@ class Face_Anonymizer():
         # end2 = timer()
         dets_lp = self.lp_detector.detect(image, BGR=BGR)
         # print('time:', end1 - start1, end2 - start2)
-        dets_head = self.generate_head_from_pose(dets_pose)
+        dets_head = self.generate_head_from_pose(dets_pose, shrink_ratio=0.8)
         dets_roi = self.fuse_detections(dets_face, dets_head, method=self.fusion_method)
         
         self.face = dets_face
@@ -105,11 +105,11 @@ class Face_Anonymizer():
         return dets_roi, dets_lp
 
 
-    def generate_head_from_pose(self, dets_pose):
+    def generate_head_from_pose(self, dets_pose, shrink_ratio=1.0):
         dets_head = []
         for pose in dets_pose:
             pp_kps = pose["keypoints"].reshape(-1,3)
-            box, box_from_face, conf = generate_head_bbox(pp_kps)
+            box, box_from_face, conf = generate_head_bbox(pp_kps, shrink_ratio=shrink_ratio)
             if box is not None:
                 dets_head.append(
                     np.array([box[0][0], box[0][1], box[1][0], box[1][1], conf])
@@ -253,6 +253,11 @@ def parse_args():
         '--multiple', 
         action='store_true', 
         help="process multiple extracted rosbag dir in this folder")
+    parser.add_argument(
+        '--save-image',
+        action='store_true',
+        help="save anonymized images"
+    )
 
     args = parser.parse_args(sys.argv[1:])
     return args
@@ -324,7 +329,7 @@ def test_two():
         cv2.waitKey(100)
 
 
-def process_a_bag(fa, rosbag_dir):
+def process_a_bag(fa, rosbag_dir, output_image=False):
     print("processing: ", rosbag_dir)
     for folder_item in os.listdir(rosbag_dir):
         if not folder_item.startswith('avt') or not folder_item.endswith('color'):
@@ -332,11 +337,14 @@ def process_a_bag(fa, rosbag_dir):
 
         image_dir = os.path.join(rosbag_dir, folder_item)
         image_names = sorted(os.listdir(image_dir))
-        image_output_dir = os.path.join(rosbag_dir, folder_item + '_anonymized')
+        
         det_path = os.path.join(rosbag_dir, folder_item + '_det.json')
         det_dict = {}
-        if not os.path.exists(image_output_dir):
-            os.mkdir(image_output_dir)
+        
+        if output_image:
+            image_output_dir = os.path.join(rosbag_dir, folder_item + '_anonymized')
+            if not os.path.exists(image_output_dir):
+                os.mkdir(image_output_dir)
 
         # cv2.namedWindow("ROI", cv2.WND_PROP_FULLSCREEN)
 
@@ -366,7 +374,8 @@ def process_a_bag(fa, rosbag_dir):
             # show_results_xyxy(image, rois)
             # cv2.imshow("ROI", image)
             # cv2.waitKey(0)
-            cv2.imwrite(os.path.join(image_output_dir, image_name), image)
+            if output_image:
+                cv2.imwrite(os.path.join(image_output_dir, image_name), image)
         
         with open(det_path, 'w') as fp:
             json.dump(det_dict, fp)
@@ -409,10 +418,10 @@ def test_process_multiple_bags():
         print(dir_list)
         for dir_name in dir_list:
             rosbag_dir = os.path.join(args.dir, dir_name)
-            process_a_bag(fa, rosbag_dir)
+            process_a_bag(fa, rosbag_dir, args.output_image)
     else:
         rosbag_dir = args.dir
-        process_a_bag(fa, rosbag_dir)
+        process_a_bag(fa, rosbag_dir, args.output_image)
 
 
 if __name__ == '__main__':
