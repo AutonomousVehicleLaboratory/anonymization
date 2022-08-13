@@ -53,10 +53,10 @@ def test_bag_to_files(bag_path, dir=None):
 
     # only take topics within this category
     topic_large = {
-        '/points_raw', 
-        '/livox/lidar', 
-        '/avt_cameras/camera1/image_color/compressed',
-        '/avt_cameras/camera6/image_color/compressed',
+        # '/points_raw', 
+        # '/livox/lidar', 
+        # '/avt_cameras/camera1/image_color/compressed',
+        # '/avt_cameras/camera6/image_color/compressed',
         '/avt_cameras/camera3/image_rect_color',
         '/avt_cameras/camera4/image_rect_color'
     }
@@ -152,7 +152,7 @@ def test_bag_to_files(bag_path, dir=None):
 
 def msg2json(msg):
    ''' Convert a ROS message to JSON format'''
-   #y = yaml.full_load(str(msg))
+   # y = yaml.full_load(str(msg))
    y = yaml.load(str(msg))
    return y # json.dumps(y,indent=4)
 
@@ -185,11 +185,11 @@ def main():
         print(bag_list)
         for bag_name in bag_list:
             bag_path = os.path.join(args.bagfile_path, bag_name)
-	    if args.overwrite==True or not os.path.exists(bag_path[0:-4]):
+            if args.overwrite==True or not os.path.exists(bag_path[0:-4]):
                 test_bag_to_files(bag_path, args.dir)
-    		if args.remove==True:
-		    print("Removing bag file:", bag_path)
-		    os.remove(bag_path)
+                if args.remove==True:
+                    print("Removing bag file:", bag_path)
+                    os.remove(bag_path)
 
 if __name__ == "__main__":
     main()
