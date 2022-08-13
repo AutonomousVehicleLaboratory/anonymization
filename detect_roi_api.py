@@ -254,9 +254,9 @@ def parse_args():
         action='store_true', 
         help="process multiple extracted rosbag dir in this folder")
     parser.add_argument(
-        '--save-image',
+        '--output-image',
         action='store_true',
-        help="save anonymized images"
+        help="output anonymized images"
     )
 
     args = parser.parse_args(sys.argv[1:])
