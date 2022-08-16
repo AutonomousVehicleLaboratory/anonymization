@@ -9,10 +9,9 @@ import sys
 import json
 import argparse
 import glob
-import cv2
 import numpy as np
 
-from utils.draw_pifpaf import draw_skeleton
+from utils.draw_pifpaf import generate_head_bbox 
 
 
 def parse_args():
@@ -111,18 +110,23 @@ def filter_boxes(labels_yolo, labels_pifpaf, method):
     return box_filtered
 
 
-def generate_new_head(head_boxes, shrink_head_ratio=0.8):
+def generate_new_head(pose_list, shrink_head_ratio=0.8):
     new_head_boxes = []
     ratio = shrink_head_ratio / 2 + 0.5
-    for head in head_boxes:
-        new_head = [
-            ratio * head[0] + (1-ratio) * head[2],
-            ratio * head[1] + (1-ratio) * head[3],
-            (1-ratio) * head[0] + ratio * head[2],
-            (1-ratio) * head[1] + ratio * head[3],
-            head[4]
-        ]
-        new_head_boxes.append(new_head)
+    
+    for pose in pose_list:
+        pp_kps = np.array(pose).reshape(-1,3)
+        box, box_from_face, conf = generate_head_bbox(pp_kps, shrink_ratio=1.0)
+        if box is not None:
+            head = np.array([box[0][0], box[0][1], box[1][0], box[1][1], conf])
+            new_head = [
+                round(ratio * head[0] + (1-ratio) * head[2]),
+                round(ratio * head[1] + (1-ratio) * head[3]),
+                round((1-ratio) * head[0] + ratio * head[2]),
+                round((1-ratio) * head[1] + ratio * head[3]),
+                head[4]
+            ]
+            new_head_boxes.append(new_head)
     return np.array(new_head_boxes)
 
 
@@ -139,7 +143,7 @@ def rewrite_json(det_dict, fusion_method='conf_fusion'):
         pose = det_frame_dict['pose']
         lp = det_frame_dict['lp']
 
-        head_new = generate_new_head(head, shrink_head_ratio=0.8)
+        head_new = generate_new_head(pose, shrink_head_ratio=0.8)
         roi_new = fuse_detections(face, head_new, method=fusion_method)
 
         det_frame_dict_new = {}
@@ -162,12 +166,14 @@ def test_rewrite_json():
 
     for file_path in glob.glob(pattern, recursive=True):
         # print(file_path)
+        bag_name = file_path.split('/')[-2]
+        file_new_path = os.path.join('/'.join(file_path.split('/')[0:-1]), bag_name + '_' + file_path.split('/')[-1])
+        # print(file_new_path)
         # continue
         with open(file_path, 'r') as fp:
             det_dict = json.load(fp)
             print('detection json file loaded from ', file_path)
             det_dict_new = rewrite_json(det_dict)
-            file_new_path = file_path[0:-5] + '_new.json'
             with open(file_new_path, 'w') as fp:
                 json.dump(det_dict_new, fp)
                 print("new detection json written to", file_new_path)
