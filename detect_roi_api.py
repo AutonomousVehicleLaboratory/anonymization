@@ -75,7 +75,7 @@ class Face_Anonymizer():
         # end2 = timer()
         dets_lp = self.lp_detector.detect(image, BGR=BGR)
         # print('time:', end1 - start1, end2 - start2)
-        dets_head = self.generate_head_from_pose(dets_pose, shrink_ratio=0.8)
+        dets_head = self.generate_head_from_pose(dets_pose, shrink_ratio=1.0)
         dets_roi = self.fuse_detections(dets_face, dets_head, method=self.fusion_method)
         
         self.face = dets_face
@@ -331,6 +331,7 @@ def test_two():
 
 def process_a_bag(fa, rosbag_dir, output_image=False):
     print("processing: ", rosbag_dir)
+    bag_name = rosbag_dir.split("/")[-1]
     for folder_item in os.listdir(rosbag_dir):
         if not folder_item.startswith('avt') or not folder_item.endswith('color'):
             continue
@@ -338,7 +339,7 @@ def process_a_bag(fa, rosbag_dir, output_image=False):
         image_dir = os.path.join(rosbag_dir, folder_item)
         image_names = sorted(os.listdir(image_dir))
         
-        det_path = os.path.join(rosbag_dir, folder_item + '_det.json')
+        det_path = os.path.join(rosbag_dir, bag_name + '_' + folder_item + '_det.json')
         det_dict = {}
         
         if output_image:
