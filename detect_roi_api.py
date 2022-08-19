@@ -75,7 +75,7 @@ class Face_Anonymizer():
         # end2 = timer()
         dets_lp = self.lp_detector.detect(image, BGR=BGR)
         # print('time:', end1 - start1, end2 - start2)
-        dets_head = self.generate_head_from_pose(dets_pose, shrink_ratio=1.0)
+        dets_head = self.generate_head_from_pose(dets_pose, shrink_ratio=0.8)
         dets_roi = self.fuse_detections(dets_face, dets_head, method=self.fusion_method)
         
         self.face = dets_face
@@ -107,13 +107,20 @@ class Face_Anonymizer():
 
     def generate_head_from_pose(self, dets_pose, shrink_ratio=1.0):
         dets_head = []
+        ratio = shrink_ratio / 2.0 + 0.5
         for pose in dets_pose:
             pp_kps = pose["keypoints"].reshape(-1,3)
-            box, box_from_face, conf = generate_head_bbox(pp_kps, shrink_ratio=shrink_ratio)
+            box, box_from_face, conf = generate_head_bbox(pp_kps)
             if box is not None:
-                dets_head.append(
-                    np.array([box[0][0], box[0][1], box[1][0], box[1][1], conf])
-                )
+                head = np.array([box[0][0], box[0][1], box[1][0], box[1][1], conf])
+                new_head = np.array([
+                    round(ratio * head[0] + (1-ratio) * head[2]),
+                    round(ratio * head[1] + (1-ratio) * head[3]),
+                    round((1-ratio) * head[0] + ratio * head[2]),
+                    round((1-ratio) * head[1] + ratio * head[3]),
+                    head[4]
+                ])
+                dets_head.append(new_head)
         return dets_head
 
     
