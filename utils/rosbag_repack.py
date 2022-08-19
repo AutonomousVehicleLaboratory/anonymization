@@ -52,7 +52,7 @@ def cmdline_args():
 
 
 def test_bag_repack(bag_path, dir=None):
-    print("processing rosbag:", bag_path)
+    print("Repacking rosbag:", bag_path)
     bag_name = bag_path.split("/")[-1]
     if dir is None:
         output_dir = bag_path[0:-4]

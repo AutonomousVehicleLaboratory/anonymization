@@ -40,7 +40,7 @@ def test_bag_to_files(bag_path, dir=None):
     """Convert a rosbag to files. Only certain topics are accepted.
     Place the large topics in topic_large, small topics in topic_dict
     """
-    print("processing rosbag:", bag_path)
+    print("Extracting rosbag:", bag_path)
     bag_name = bag_path.split("/")[-1]
     if dir is None:
         output_dir = bag_path[0:-4]
