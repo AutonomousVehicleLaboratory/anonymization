@@ -9,7 +9,13 @@
     # For paper source code
     detect_face.py # given json of output of face detection and pose detection, fuse and track.    
     evaluate.py    # evaluate the detection
-    sort.py        # tracker   
+    sort.py        # tracker
+
+    # Data processing pipeline
+    utils/rosbag_to_files.py    # extract data from rosbag
+    detect_roi_api.py           # generate the json file
+    utils/rosbag_repack.py      # pack anonymized data into rosbag
+    utils/rosbag_sampling.py    # sample for review
 ```
 
 ## Guide
