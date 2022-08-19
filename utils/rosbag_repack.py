@@ -61,7 +61,8 @@ def test_bag_repack(bag_path, dir=None):
         output_dir = os.path.join(dir, bag_name[0:-4])
         outbag_path = os.path.join(dir, bag_name[0:-4] + '_anonymized.bag')
     if not osp.exists(output_dir):
-        os.mkdir(output_dir)
+        print('no output dir for each bag, use args.dir instead')
+        output_dir = dir
 
     # only take topics within this category
     topics_origin = {
@@ -73,22 +74,15 @@ def test_bag_repack(bag_path, dir=None):
 
     print('These topics are going to be replaed')
     for topic in topics_origin: print(topic)
-    print(topics_anony)    
+    # print(topics_anony)    
     
     topic_dir_name_dict = {}
-    topic_dir_path_dict = {}
     for topic in topics_origin:
         # create dir for the topic
         topic_dir_name = '_'.join([item for item in topic.split('/') if item != ''])
-        topic_dir_path = osp.join(output_dir, topic_dir_name)
-        if not osp.exists(topic_dir_path):
-            print('Error: topic dir path not found for', topic)
-            exit(0)
         topic_dir_name_dict[topic] = topic_dir_name
-        topic_dir_path_dict[topic] = topic_dir_path
             
-    print(topic_dir_name_dict)
-    print(topic_dir_path_dict)
+    # print(topic_dir_name_dict)
 
     det_json_dict = {}
 
@@ -104,10 +98,9 @@ def test_bag_repack(bag_path, dir=None):
             if topic in topics_origin:
                 # replace
                 topic_dir_name = topic_dir_name_dict[topic]
-                topic_dir_path = topic_dir_path_dict[topic]
                 
                 if topic not in det_json_dict:
-                    det_path = os.path.join(output_dir, topic_dir_name + '_det.json')
+                    det_path = os.path.join(output_dir, bag_name[0:-4] + '_' + topic_dir_name + '_det.json')
                     with open(det_path, 'r') as det_json_fp:
                         det_json = json.load(det_json_fp)
                         det_json_dict[topic] = det_json
@@ -130,8 +123,6 @@ def test_bag_repack(bag_path, dir=None):
                 # cv2.waitKey(0)
                 msg_out = bridge.cv2_to_imgmsg(image_in, encoding="passthrough")
                 outbag.write(topics_anony[topic], msg_out, t)
-                # add extra message
-
 
             else:
                 outbag.write(topic, msg, t) # msg.header.stamp)
@@ -152,11 +143,10 @@ def main():
         print(bag_list)
         for bag_name in bag_list:
             bag_path = os.path.join(args.bagfile_path, bag_name)
-	    if args.overwrite==True or not os.path.exists(bag_path[0:-4]):
-                test_bag_repack(bag_path, args.dir)
-    		if args.remove==True:
-		    print("Removing bag file:", bag_path)
-		    os.remove(bag_path)
+            test_bag_repack(bag_path, args.dir)
+            if args.remove==True:
+                print("Removing bag file:", bag_path)
+                os.remove(bag_path)
 
 if __name__ == "__main__":
     main()
