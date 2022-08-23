@@ -13,6 +13,7 @@ import numpy as np
 import rosbag
 import cv2
 from cv_bridge import CvBridge
+from sensor_msgs.msg import CompressedImage
 import json
 import yaml
 import argparse
@@ -70,14 +71,25 @@ def test_bag_sampling(bag_path, dir=None):
         print('\n All topics in the bag')
         print(type.topics.keys())
 
-        sample_gap = 50
+        sample_gap = 10
         topic_dict = {}
         for topic, msg, t in bag.read_messages():
             if topic not in topic_dict:
                 topic_dict[topic] = 0
             
             if topic_dict[topic] % sample_gap == 0:
-                outbag.write(topic, msg, t) # msg.header.stamp)
+                if topic.endswith("image_rect_color_anonymized"):
+                    np_arr = np.fromstring(msg.data, np.uint8)
+                    image_np = np_arr.reshape(msg.height, msg.width, -1)
+                    msg_out = CompressedImage()
+                    msg_out.header.stamp = msg.header.stamp
+                    msg_out.format = "jpeg"
+                    msg_out.data = np.array(cv2.imencode('.jpg', image_np)[1]).tostring()
+                    topic_out = topic + "/compressed"
+                    # Publish new image
+                    outbag.write(topic_out, msg_out, t)
+                else:
+                    outbag.write(topic, msg, t) # msg.header.stamp)
             topic_dict[topic] += 1
 
 
