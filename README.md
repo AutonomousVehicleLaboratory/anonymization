@@ -11,6 +11,8 @@ Authors: Hengyuan Zhang*, Jing-Yan Liao*, David Paz and Henrik I. Christensen.
 
 Abstract: Many outdoor autonomous mobile platforms require more human identity anonymized data to power their data-driven algorithms. The human identity anonymization should be robust so that less manual intervention is needed, which remains a challenge for current face detection and anonymization systems. In this paper, we propose to use the skeleton generated from the state-of-the-art human pose estimation model to help localize human heads. We develop criteria to evaluate the performance and compare it with the face detection approach. We demonstrate that the proposed algorithm can reduce missed faces and thus better protect the identity information for the pedestrians. We also develop a confidence-based fusion method to further improve the performance.
 
+Note that the source code in this repository are for reference and may not be fully packaged. We tried to make it more user friendly with the detect_*_api.py files.
+
 ## Structure
 ```
     # For experiments
