@@ -11,7 +11,7 @@ Authors: Hengyuan Zhang*, Jing-Yan Liao*, David Paz and Henrik I. Christensen.
 
 Abstract: Many outdoor autonomous mobile platforms require more human identity anonymized data to power their data-driven algorithms. The human identity anonymization should be robust so that less manual intervention is needed, which remains a challenge for current face detection and anonymization systems. In this paper, we propose to use the skeleton generated from the state-of-the-art human pose estimation model to help localize human heads. We develop criteria to evaluate the performance and compare it with the face detection approach. We demonstrate that the proposed algorithm can reduce missed faces and thus better protect the identity information for the pedestrians. We also develop a confidence-based fusion method to further improve the performance.
 
-Note that the source code in this repository are for reference and may not be fully packaged. We tried to make it more user friendly with the detect_*_api.py files.
+__Note__: The source code in this repository are for reference and may not be fully packaged. We tried to make it more user friendly with the detect_*_api.py files.
 
 ## Structure
 ```
@@ -40,7 +40,3 @@ Note that the source code in this repository are for reference and may not be fu
 [face detection weight](https://drive.google.com/open?id=12O1RPth4CJR_Fk5-Izr4a466PpVxzV9R&authuser=j3liao%40ucsd.edu&usp=drive_fs)
 
 - If you want to use a different configuration other than specifed in the config/base_config_detect_face_api.py, please copy the default_api.yaml, modify it and pass it to the command line. For example, run: python detect_roi_api --cfg myconfig.yaml
-
-
-## Tracker tunning
-- You don't need to rerun the detection everytime when you are tunning the tracker. We provided detect_and_save, track_from_save to allow you run the detection on cluster and save the detection to a json file. Then you can download the json file to your local machine and play the tracker, even when you don't have a GPU on your local machine.
