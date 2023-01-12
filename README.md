@@ -2,7 +2,10 @@
 
 ## Introduction
 
-This is the offcial repository for our paper: __Robust Human Identity Anonymization using Pose Estimation__[[IEEE]](https://ieeexplore.ieee.org/document/9926568)[[Arxiv link to be added]]().
+This is the offcial repository for our paper: __Robust Human Identity Anonymization using Pose Estimation__[[IEEE]](https://ieeexplore.ieee.org/document/9926568)[[arXiv]](http://arxiv.org/abs/2301.04243).
+
+[![Watch the video](https://img.youtube.com/vi/XQaNiXgGr40/maxresdefault.jpg)](https://youtu.be/XQaNiXgGr40)
+
 
 Authors: Hengyuan Zhang*, Jing-Yan Liao*, David Paz and Henrik I. Christensen.
 
