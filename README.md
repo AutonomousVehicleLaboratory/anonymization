@@ -37,6 +37,6 @@ __Note__: The source code in this repository are for reference and may not be fu
 - Install requirements
 ``pip install -r AVL.env.txt``
 - Install weights
-[face detection weight](https://drive.google.com/open?id=12O1RPth4CJR_Fk5-Izr4a466PpVxzV9R&authuser=j3liao%40ucsd.edu&usp=drive_fs)
+[face detection weight](https://drive.google.com/open?id=12O1RPth4CJR_Fk5-Izr4a466PpVxzV9R&authuser=j3liao%40ucsd.edu&usp=drive_fs) or [YOLO5Face repository pretrained models](https://github.com/deepcam-cn/yolov5-face#pretrained-models)
 
 - If you want to use a different configuration other than specifed in the config/base_config_detect_face_api.py, please copy the default_api.yaml, modify it and pass it to the command line. For example, run: python detect_roi_api --cfg myconfig.yaml
