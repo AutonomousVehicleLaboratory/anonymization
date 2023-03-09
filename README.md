@@ -46,7 +46,7 @@ __Bibtex__
 ```
 @inproceedings{zhang2022CASE:anonymization,
   address = {Mexico City},
-  author = {H. Zhang and J.-Y. Liao and D. Paz and
+  author = {H. Zhang and J. Liao and D. Paz and
  H. Christensen},
   booktitle = {18th International Conference on Automation Science
  and Engineering (CASE)},
